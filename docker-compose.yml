@@ -1,0 +1,20 @@
+version: '2.1'
+
+services:
+   php-cli:
+      image: php:7.3-cli
+      user: ${USER_ID}
+      volumes:
+         - .:/src
+      working_dir: /src
+
+   composer:
+      image: composer:latest
+      user: ${USER_ID}
+      volumes:
+         - .:/src
+         - ${HOME}/.composer:/.composer
+      working_dir: /src
+      environment:
+         - COMPOSER_CACHE_DIR=/.composer
+         - COMPOSER_ALLOW_SUPERUSER=1
