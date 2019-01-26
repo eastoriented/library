@@ -62,15 +62,18 @@ bin/php: | bin/. $(DOCKER_COMPOSE)
 bin/atoum: | bin/. .atoum.php vendor $(DOCKER_COMPOSE)
 	$(call binary,$@,php-cli,/src/vendor/$@)
 
-bin/composer: | bin/.
+bin/composer: | bin/. .env $(DOCKER_COMPOSE)
 	$(call binary,$@,composer,composer)
 
-vendor: composer.json | .env $(DOCKER_COMPOSE)
-	$(DOCKER_COMPOSE) run --rm composer composer install
+vendor: composer.json | bin/composer
+	bin/composer install
 
 bin/docker-compose: .env | $(call locate,curl) bin/.
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
 	chmod u+x $@
+
+composer.lock: composer.json | bin/composer
+	bin/composer update
 
 .PHONY: tests/units
 tests/units: | bin/php tests/units/runner.php
