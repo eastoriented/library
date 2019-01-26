@@ -21,19 +21,36 @@ endef
 %/.:
 	$(MKDIR) $@
 
-install: bin/php bin/atoum bin/composer .git
+install: bin/php bin/composer git VERSION src/. tests/units/runner.php
 
-.git:
+.PHONY: git
+git: .git .gitignore .gitattributes .git/hooks/pre-commit
+
+.git: $(call locate,git)
 	git init
+
+.git%:
+	cp resources/git/$@ $@
+
+.git/hooks/pre-commit:
+	$(call write,$@,'#!/usr/bin/env sh')
+	$(call write,$@,make tests/units)
+	chmod u+x $@
 
 .env:
 	$(call write,$@,"HOME=$(HOME)")
 	$(call write,$@,"USER_ID=$$(id -u):$$(id -g)")
 
+.atoum.php:
+	cp resources/atoum/$@ $@
+
+VERSION:
+	$(call write,$@,\$$Format:%ai\$$ \$$Format:%d\$$ \$$Format:%H\$$)
+
 bin/php: | bin/. $(DOCKER_COMPOSE)
 	$(call binary,$@,php-cli,php)
 
-bin/atoum: | bin/. vendor $(DOCKER_COMPOSE)
+bin/atoum: | bin/. .atoum.php vendor $(DOCKER_COMPOSE)
 	$(call binary,$@,php-cli,/src/vendor/$@)
 
 bin/composer: | bin/.
@@ -46,8 +63,9 @@ bin/docker-compose: .env | $(call locate,curl) bin/.
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
 	chmod u+x $@
 
-uninstall:
-	$(RM) .env bin vendor
+.PHONY: tests/units
+tests/units: | bin/php tests/units/runner.php
+	bin/php tests/units/runner.php
 
-clean: uninstall
-	$(RM) .git
+tests/units/runner.php: | bin/atoum tests/units/src/.
+	cp -r resources/atoum/tests .
