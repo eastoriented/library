@@ -21,7 +21,7 @@ endef
 %/.:
 	$(MKDIR) $@
 
-install: bin/php bin/composer git VERSION src/. tests/units/runner.php
+install: bin/php bin/composer git VERSION LICENCE README.md src/. tests/units/runner.php .travis.yml
 
 .PHONY: git
 git: .git .gitignore .gitattributes .git/hooks/pre-commit
@@ -43,6 +43,15 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 
 .atoum.php:
 	cp resources/atoum/$@ $@
+
+README.md:
+	cp resources/$@ $@
+
+LICENCE:
+	cp resources/$@ $@
+
+.travis.yml:
+	cp resources/$@ $@
 
 VERSION:
 	$(call write,$@,\$$Format:%ai\$$ \$$Format:%d\$$ \$$Format:%H\$$)
