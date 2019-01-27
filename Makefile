@@ -18,10 +18,18 @@ define write
 echo $2 >> $1
 endef
 
+.SILENT:
+
+.SUFFIXES:
+
+.DELETE_ON_ERROR:
+
+.PRECIOUS: %/.
+
 %/.:
 	$(MKDIR) $@
 
-install: bin/php bin/composer git VERSION LICENCE README.md src/. tests/units/runner.php .travis.yml
+install: $(call locate,docker) bin/php bin/composer git VERSION LICENCE README.md src/. tests/units/runner.php .travis.yml
 
 .PHONY: git
 git: .git .gitignore .gitattributes .git/hooks/pre-commit
@@ -66,7 +74,7 @@ bin/composer: | bin/. .env $(DOCKER_COMPOSE)
 	$(call binary,$@,composer,composer)
 
 vendor: composer.json | bin/composer
-	bin/composer install
+	bin/composer install --no-suggest
 
 bin/docker-compose: .env | $(call locate,curl) bin/.
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
