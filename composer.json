@@ -1,5 +1,12 @@
 {
-	"require-dev": {
-		"atoum/atoum": "^3"
-	}
+	"name": "eastoriented/library",
+	"description": "A blueprint to setup a develoment environment for library with docker",
+	"type": "project",
+	"license": "BSD-2-Clause",
+	"authors": [
+		{
+			"name": "Frédéric Hardy",
+			"email": "frederic.hardy@mageekbox.net"
+		}
+	]
 }

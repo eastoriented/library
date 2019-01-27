@@ -31,46 +31,11 @@ endef
 %/.:
 	$(MKDIR) $@
 
-install: $(call locate,docker) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md src/. tests/units/runner.php .travis.yml
-
-.PHONY: git
-git: .git .gitignore .gitattributes .git/hooks/pre-commit
-
-.git: $(call locate,git)
-	git init
-
-.git%:
-	cp $(RESOURCES_DIR)/git/$@ $@
-
-.git/hooks/pre-commit:
-	$(call write,$@,'#!/usr/bin/env sh')
-	$(call write,$@,make tests/units)
-	chmod u+x $@
+install: $(call locate,docker) bin/php bin/composer
 
 .env:
 	$(call write,$@,"HOME=$(HOME)")
 	$(call write,$@,"USER_ID=$$(id -u):$$(id -g)")
-
-.atoum.php:
-	cp $(RESOURCES_DIR)/atoum/$@ $@
-
-Makefile:
-	$(call write,$@,include .do_not_touch/Makefile)
-
-.do_not_touch/Makefile: | .do_not_touch/.
-	cp $(RESOURCES_DIR)/Makefile $@
-
-README.md:
-	cp $(RESOURCES_DIR)/$@ $@
-
-LICENCE:
-	cp $(RESOURCES_DIR)/$@ $@
-
-.travis.yml:
-	cp $(RESOURCES_DIR)/$@ $@
-
-VERSION:
-	$(call write,$@,\$$Format:%ai\$$ \$$Format:%d\$$ \$$Format:%H\$$)
 
 bin/php: | docker-compose.yml bin/. $(DOCKER_COMPOSE)
 	$(call binary,$@,php-cli,php)
@@ -81,14 +46,8 @@ bin/atoum: | docker-compose.yml bin/. .atoum.php vendor $(DOCKER_COMPOSE)
 bin/composer: | docker-compose.yml bin/. .env $(DOCKER_COMPOSE)
 	$(call binary,$@,composer,composer)
 
-composer.json: | bin/composer
-	bin/composer require --dev --no-suggest atoum/atoum ^3
-
 vendor: composer.json | bin/composer
 	bin/composer install --no-suggest
-
-docker-compose.yml:
-	cp $(THIS_DIR)/docker-compose.yml $@
 
 bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
@@ -100,6 +59,3 @@ composer.lock: composer.json | bin/composer
 .PHONY: unit-tests
 unit-tests: | bin/php tests/units/runner.php
 	bin/php tests/units/runner.php
-
-tests/units/runner.php: | bin/atoum tests/units/src/.
-	cp -r $(RESOURCES_DIR)/atoum/tests .
