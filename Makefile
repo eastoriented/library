@@ -75,17 +75,12 @@ VERSION:
 bin/php: | docker-compose.yml bin/. $(DOCKER_COMPOSE)
 	$(call binary,$@,php-cli,php)
 
-bin/atoum: | docker-compose.yml bin/. .atoum.php vendor $(DOCKER_COMPOSE)
+bin/atoum: | docker-compose.yml bin/. .atoum.php bin/composer $(DOCKER_COMPOSE)
+	bin/composer require --dev --no-suggest atoum/atoum ^3
 	$(call binary,$@,php-cli,/src/vendor/$@)
 
 bin/composer: | docker-compose.yml bin/. .env $(DOCKER_COMPOSE)
 	$(call binary,$@,composer,composer)
-
-composer.json: | bin/composer
-	bin/composer require --dev --no-suggest atoum/atoum ^3
-
-vendor: composer.json | bin/composer
-	bin/composer install --no-suggest
 
 docker-compose.yml:
 	cp $(THIS_DIR)/docker-compose.yml $@
