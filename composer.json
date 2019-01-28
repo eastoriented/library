@@ -10,6 +10,6 @@
 		}
 	],
 	"bin": [
-		"bin/init-eastoriented-library"
+		"bin/eastoriented-library"
 	]
 }
