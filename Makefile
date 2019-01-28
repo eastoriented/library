@@ -57,7 +57,7 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 Makefile:
 	$(call write,$@,include .do_not_touch/Makefile)
 
-.do_not_touch/Makefile: | .do_not_touch/.
+.do_not_touch/Makefile: $(RESOURCES_DIR)/Makefile | .do_not_touch/.
 	cp $(RESOURCES_DIR)/Makefile $@
 
 README.md:
