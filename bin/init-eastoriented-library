@@ -2,4 +2,4 @@
 
 set -e
 
-exec make -f vendor/eastoriented/library/Makefile install
+make -f vendor/eastoriented/library/Makefile install
