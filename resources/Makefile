@@ -73,6 +73,10 @@ vendor/update: | bin/composer ## Update `vendor` directory
 composer.lock: composer.json | bin/composer ## Update `composer.lock` according to `composer.json\`
 	bin/composer update
 
+.PHONY: autoload
+autoload: composer.json | bin/composer ## Generate autoload files
+	bin/composer dump-autoload
+
 .PHONY: unit-tests
 unit-tests: | bin/php tests/units/runner.php ## Run unit tests
 	bin/php tests/units/runner.php
