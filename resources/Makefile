@@ -61,6 +61,7 @@ vendor: composer.json | bin/composer ## Create `vendor` directory
 
 vendor/update: | bin/composer ## Update `vendor` directory
 	bin/composer update --no-suggest
+	./vendor/bin/eastoriented-library install
 
 composer.lock: composer.json | bin/composer ## Update `composer.lock` according to `composer.json\`
 	bin/composer update
