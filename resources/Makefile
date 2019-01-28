@@ -1,3 +1,10 @@
+#
+# This file is part of eastoriented/library.
+#
+# For the sake of mankind, DO NOT MODIFY IT!
+#
+# Have a good day!
+#
 THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 RESOURCES_DIR := $(THIS_DIR)/resources
 MKDIR=mkdir -p
