@@ -2,4 +2,9 @@
 
 set -e
 
-$(which make) -f vendor/eastoriented/library/Makefile "$@"
+if ! [ -x "$(command -v make)" ]; then
+  echo 'Error: `make` is not installed.' >&2
+  exit 1
+fi
+
+make -f vendor/eastoriented/library/Makefile "$@"
