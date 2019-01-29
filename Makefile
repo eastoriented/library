@@ -75,19 +75,19 @@ VERSION:
 bin/php: | docker-compose.yml bin/. $(DOCKER_COMPOSE)
 	$(call binary,$@,php-cli,php)
 
-bin/atoum: | docker-compose.yml bin/. .atoum.php bin/composer $(DOCKER_COMPOSE)
+bin/atoum: | bin/. .atoum.php bin/composer $(DOCKER_COMPOSE)
 	bin/composer require --dev --no-suggest atoum/atoum ^3
 	$(call binary,$@,php-cli,/src/vendor/$@)
 
 bin/composer: | docker-compose.yml bin/. .env $(DOCKER_COMPOSE)
 	$(call binary,$@,composer,composer)
 
-docker-compose.yml: $(THIS_DIR)/docker-compose.yml
-	cp $(THIS_DIR)/docker-compose.yml $@
-
 bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
 	chmod u+x $@
+
+docker-compose.yml: $(RESOURCES_DIR)/docker-compose.yml
+	cp $(RESOURCES_DIR)/docker-compose.yml $@
 
 tests/units/runner.php: | bin/atoum tests/units/src/.
 	cp -r $(RESOURCES_DIR)/atoum/tests .
