@@ -87,13 +87,13 @@ unit-tests: | bin/php tests/units/runner.php ## Run unit tests
 	bin/php tests/units/runner.php
 
 .PHONY: version/new/major
-version/new/major: | bin/docker-compose
+version/new/major: | bin/docker-compose ## Create tag for new major version
 	$(call semver,major)
 
 .PHONY: version/new/minor
-version/new/minor: | bin/docker-compose
+version/new/minor: | bin/docker-compose ## Create tag for new minor version
 	$(call semver,minor)
 
 .PHONY: version/new/patch
-version/new/patch: | bin/docker-compose
+version/new/patch: | bin/docker-compose ## Create tag for new patch version
 	$(call semver,patch)
