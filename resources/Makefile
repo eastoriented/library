@@ -11,6 +11,7 @@ MKDIR=mkdir -p
 RM=rm -rf
 DOCKER_COMPOSE=$(shell which docker-compose || echo 'bin/docker-compose')
 DOCKER_COMPOSE_VERSION=1.23.2
+CURRENT_VERSION?=$(shell git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)
 
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
@@ -21,6 +22,10 @@ $(call write,$1,'#!/usr/bin/env sh')
 $(call write,$1,'set -e')
 $(call write,$1,'exec $(DOCKER_COMPOSE) run --rm $2 $3 "$$@"')
 chmod u+x $1
+endef
+
+define semver
+git tag $$(bin/docker-compose run --rm semver semver -c -i $1 $$(git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0))
 endef
 
 define write
@@ -80,3 +85,15 @@ autoload: composer.json | bin/composer ## Generate autoload files
 .PHONY: unit-tests
 unit-tests: | bin/php tests/units/runner.php ## Run unit tests
 	bin/php tests/units/runner.php
+
+.PHONY: version/new/major
+version/new/major: | bin/docker-compose
+	$(call semver,major)
+
+.PHONY: version/new/minor
+version/new/minor: | bin/docker-compose
+	$(call semver,minor)
+
+.PHONY: version/new/patch
+version/new/patch: | bin/docker-compose
+	$(call semver,patch)
