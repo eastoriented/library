@@ -82,19 +82,12 @@ bin/atoum: | docker-compose.yml bin/. .atoum.php bin/composer $(DOCKER_COMPOSE)
 bin/composer: | docker-compose.yml bin/. .env $(DOCKER_COMPOSE)
 	$(call binary,$@,composer,composer)
 
-docker-compose.yml:
+docker-compose.yml: $(THIS_DIR)/docker-compose.yml
 	cp $(THIS_DIR)/docker-compose.yml $@
 
 bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
 	chmod u+x $@
-
-composer.lock: composer.json | bin/composer
-	bin/composer update
-
-.PHONY: unit-tests
-unit-tests: | bin/php tests/units/runner.php
-	bin/php tests/units/runner.php
 
 tests/units/runner.php: | bin/atoum tests/units/src/.
 	cp -r $(RESOURCES_DIR)/atoum/tests .
