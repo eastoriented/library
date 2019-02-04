@@ -1,9 +1,8 @@
 <?php
 
-namespace norsys\score\tests\units;
+namespace eastoriented\tests\units;
 
-use mageekguy\atoum\mock;
-use norsys\score\php\string\{ provider, recipient };
+use atoum\mock;
 
 abstract class test extends \atoum
 {
@@ -17,12 +16,5 @@ abstract class test extends \atoum
 		;
 
 		return parent::beforeTestMethod($method);
-	}
-
-	protected function providerHasString(provider $provider, string $string)
-	{
-		$this->calling($provider)->recipientOfStringIs = function($aRecipient) use ($string) {
-			$aRecipient->stringIs($string);
-		};
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace norsys\score\tests\units;
+namespace eastoriented\tests\units;
 
 if (defined('atoum\scripts\runner') === false)
 {

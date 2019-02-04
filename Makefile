@@ -31,7 +31,7 @@ endef
 %/.:
 	$(MKDIR) $@
 
-install: $(call locate,docker) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md src/. tests/units/runner.php .travis.yml
+install: $(call locate,docker) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md src/. tests/units .travis.yml
 
 .PHONY: git
 git: .git .gitignore .gitattributes .git/hooks/pre-commit
@@ -89,5 +89,12 @@ bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml
 docker-compose.yml: $(RESOURCES_DIR)/docker-compose.yml
 	cp $(RESOURCES_DIR)/docker-compose.yml $@
 
-tests/units/runner.php: | bin/atoum tests/units/src/.
-	cp -r $(RESOURCES_DIR)/atoum/tests .
+tests/units: tests/units/runner.php tests/units/test.php tests/units/src
+
+tests/units/src: tests/units/src/.
+
+tests/units/runner.php: | bin/atoum tests/units/.
+	cp -r $(RESOURCES_DIR)/atoum/$@ $@
+
+tests/units/test.php: | bin/atoum tests/units/.
+	cp -r $(RESOURCES_DIR)/atoum/$@ $@
