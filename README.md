@@ -11,10 +11,13 @@ The only requirement to use `eastoriented/library` is [docker](https://docs.dock
 
 # Installation
 
-Execute the following command in a terminal: `wget -O -  https://raw.githubusercontent.com/eastoriented/library/master/install.sh | sh`.
-At end of process, you obtains an arborescence which contains all files needed to develop a PHP class:
+Execute the following command in a terminal:
 
-- `bin` directory contains wrapper to `docker-compose` to use `php`, `composer`, `docker-compose` and `atoum`.
+```
+wget -O -  https://raw.githubusercontent.com/eastoriented/library/master/install.sh | sh
+```
+
+At end of process, you obtains an arborescence which contains all files needed to develop a PHP class:
 
 # Update
 
