@@ -83,7 +83,7 @@ autoload: composer.json | bin/composer ## Generate autoload files
 	bin/composer dump-autoload
 
 .PHONY: unit-tests
-unit-tests: | bin/php tests/units/runner.php ## Run unit tests
+unit-tests: | bin/php tests/units/runner.php vendor ## Run unit tests
 	bin/php tests/units/runner.php
 
 .PHONY: version/new/major
