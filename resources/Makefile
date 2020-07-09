@@ -9,9 +9,9 @@ THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 RESOURCES_DIR := $(THIS_DIR)/resources
 MKDIR=mkdir -p
 RM=rm -rf
-DOCKER_COMPOSE=$(shell which docker-compose || echo 'bin/docker-compose')
+DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
 DOCKER_COMPOSE_VERSION=1.23.2
-CURRENT_VERSION?=$(shell git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)
+CURRENT_VERSION:=$(shell git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)
 
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
@@ -75,7 +75,7 @@ vendor/update: | bin/composer ## Update `vendor` directory
 	bin/composer update --no-suggest
 	./vendor/bin/eastoriented-library install
 
-composer.lock: composer.json | bin/composer ## Update `composer.lock` according to `composer.json\`
+composer.lock: composer.json | bin/composer ## Update `composer.lock` according to `composer.json`
 	bin/composer update
 
 .PHONY: autoload
