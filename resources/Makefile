@@ -30,7 +30,7 @@ chmod u+x $1
 endef
 
 define semver
-git tag $$(bin/docker-compose run --rm semver semver -c -i $1 $$(git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0))
+git tag $$($(DOCKER_COMPOSE) run --rm semver semver -c -i $1 $$(git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0))
 endef
 
 define write
@@ -92,15 +92,15 @@ unit-tests: | bin/php tests/units/runner.php vendor ## Run unit tests
 	bin/php tests/units/runner.php
 
 .PHONY: version/new/major
-version/new/major: | bin/docker-compose ## Create tag for new major version
+version/new/major: | $(DOCKER_COMPOSE) ## Create tag for new major version
 	$(call semver,major)
 
 .PHONY: version/new/minor
-version/new/minor: | bin/docker-compose ## Create tag for new minor version
+version/new/minor: | $(DOCKER_COMPOSE) ## Create tag for new minor version
 	$(call semver,minor)
 
 .PHONY: version/new/patch
-version/new/patch: | bin/docker-compose ## Create tag for new patch version
+version/new/patch: | $(DOCKER_COMPOSE) ## Create tag for new patch version
 	$(call semver,patch)
 
 .PHONY: verbose
