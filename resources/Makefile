@@ -73,15 +73,14 @@ bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml ## Creat
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
 	chmod u+x $@
 
-vendor: composer.json | bin/composer ## Create `vendor` directory
+vendor: vendor/autoload.php
+
+vendor/autoload.php: composer.lock | bin/composer ## Create `vendor` directory
 	bin/composer install --no-suggest
 
 vendor/update: | bin/composer ## Update `vendor` directory
 	bin/composer update --no-suggest
 	./vendor/bin/eastoriented-library install
-
-composer.lock: composer.json | bin/composer ## Update `composer.lock` according to `composer.json`
-	bin/composer update
 
 .PHONY: autoload
 autoload: composer.json | bin/composer ## Generate autoload files
