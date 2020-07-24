@@ -13,6 +13,11 @@ DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
 DOCKER_COMPOSE_VERSION=1.23.2
 CURRENT_VERSION:=$(shell git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)
 
+ifneq ($(WITH_DEBUG),)
+OLD_SHELL := $(SHELL)
+SHELL = $(warning $(if $@, Update target $@)$(if $<, from $<)$(if $?, due to $?))$(OLD_SHELL) -x
+endif
+
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
 endef
@@ -97,3 +102,12 @@ version/new/minor: | bin/docker-compose ## Create tag for new minor version
 .PHONY: version/new/patch
 version/new/patch: | bin/docker-compose ## Create tag for new patch version
 	$(call semver,patch)
+
+.PHONY: verbose
+ifeq "$(firstword $(MAKECMDGOALS))" "verbose"
+verbose: ## Display all executed commands during targets building
+	$(MAKE) $(filter-out verbose,$(MAKECMDGOALS)) WITH_DEBUG=TRUE
+else
+verbose:
+	$(error Verbose syntax is `make verbose <target>`, not `make <target> verbose`)
+endif
