@@ -1,0 +1,11 @@
+variables:
+  GIT_STRATEGY: fetch
+
+stages:
+  - tests
+
+tests/units:
+  stage: tests
+  script:
+    - make tests/units
+

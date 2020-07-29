@@ -14,10 +14,15 @@ The only requirement to use `eastoriented/library` is [docker](https://docs.dock
 Execute the following command in a terminal:
 
 ```
-wget -O -  https://raw.githubusercontent.com/eastoriented/library/master/install.sh | sh
+wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | sh
 ```
 
 At end of process, you obtains an arborescence which contains all files needed to develop a PHP class:
+By default, a `.travis.yml` file will be created, but if you want a `.gitlab-ci.yml`, just do:
+
+```
+export CI_CONFIG_FILE=.gitlab-ci.yml && wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | sh
+```
 
 # Update
 

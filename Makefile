@@ -3,7 +3,7 @@ RESOURCES_DIR := $(THIS_DIR)/resources
 MKDIR=mkdir -p
 RM=rm -rf
 DOCKER_COMPOSE=$(shell which docker-compose || echo 'bin/docker-compose')
-DOCKER_COMPOSE_VERSION=1.23.2
+CI_CONFIG_FILE?=.travis.yml
 
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
@@ -31,7 +31,7 @@ endef
 %/.:
 	$(MKDIR) $@
 
-install: $(call locate,docker) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md src/. tests/units .travis.yml
+install: $(call locate,docker) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md src/. tests/units $(CI_CONFIG_FILE)
 
 .PHONY: git
 git: .git .gitignore .gitattributes .git/hooks/pre-commit
@@ -57,8 +57,11 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 Makefile:
 	$(call write,$@,include .do_not_touch/Makefile)
 
-.do_not_touch/Makefile: $(RESOURCES_DIR)/Makefile | .do_not_touch/.
+.do_not_touch/Makefile: $(RESOURCES_DIR)/Makefile | .do_not_touch/config.mk
 	cp $(RESOURCES_DIR)/Makefile $@
+
+.do_not_touch/config.mk: | .do_not_touch/.
+	$(call write,$@,"CI_CONFIG_FILE=$(CI_CONFIG_FILE)")
 
 README.md:
 	cp $(RESOURCES_DIR)/$@ $@
@@ -67,6 +70,9 @@ LICENCE:
 	cp $(RESOURCES_DIR)/$@ $@
 
 .travis.yml:
+	cp $(RESOURCES_DIR)/$@ $@
+
+.gitlab-ci.yml:
 	cp $(RESOURCES_DIR)/$@ $@
 
 VERSION:
@@ -82,6 +88,7 @@ bin/atoum: | bin/. .atoum.php bin/composer $(DOCKER_COMPOSE)
 bin/composer: | docker-compose.yml bin/. .env $(DOCKER_COMPOSE)
 	$(call binary,$@,composer,composer)
 
+bin/docker-compose: DOCKER_COMPOSE_VERSION=$(shell curl --silent "https://api.github.com/repos/docker/compose/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"([^"]+)".*/\1/')
 bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
 	chmod u+x $@

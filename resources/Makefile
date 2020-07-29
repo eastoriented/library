@@ -5,6 +5,8 @@
 #
 # Have a good day!
 #
+include .do_not_touch/config.mk
+
 THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 RESOURCES_DIR := $(THIS_DIR)/resources
 MKDIR=mkdir -p
