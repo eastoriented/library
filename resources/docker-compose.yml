@@ -3,7 +3,7 @@ version: '2.1'
 services:
    php-cli:
       network_mode: bridge
-      image: php:7.3-cli
+      image: php:7.4-cli
       user: ${USER_ID}
       volumes:
          - .:/src
