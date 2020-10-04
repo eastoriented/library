@@ -12,7 +12,6 @@ RESOURCES_DIR := $(THIS_DIR)/resources
 MKDIR=mkdir -p
 RM=rm -rf
 DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
-DOCKER_COMPOSE_VERSION=1.23.2
 CURRENT_VERSION:=$(shell git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)
 
 ifneq ($(WITH_DEBUG),)
@@ -71,6 +70,7 @@ bin/atoum: | docker-compose.yml bin/. .atoum.php vendor $(DOCKER_COMPOSE) ## Cre
 bin/composer: | docker-compose.yml bin/. .env $(DOCKER_COMPOSE) ## Create wrapper for `composer` using `docker`
 	$(call binary,$@,composer,composer)
 
+bin/docker-compose: DOCKER_COMPOSE_VERSION=$(shell curl --silent "https://api.github.com/repos/docker/compose/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"([^"]+)".*/\1/')
 bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml ## Create wrapper for `docker-compose` using `docker`
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
 	chmod u+x $@
