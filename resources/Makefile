@@ -106,9 +106,9 @@ version/new/minor: | $(DOCKER_COMPOSE) ## <Versioning> Create tag for new minor 
 version/new/patch: | $(DOCKER_COMPOSE) ## <Versioning> Create tag for new patch version
 	$(call semver,patch)
 
-## The help, because if no help, no RTFM
+.PHONY: help
 help: ## <Help> Display this help.
-	sed -e '/#\{2\}\s/!d; s/:[^#]*##/:/; s/\([^:]*\):\s<\([^>]*\)>\s\(.*\)/\2:\1:\3/; s/\([^:]*\):\s\([^<]*.*\)/Misc.:\1:\2/' $(MAKEFILE_LIST) | \
+	sed -e '/#\{2\} /!d; s/:[^#]*##/:/; s/\([^:]*\): <\([^>]*\)> \(.*\)/\2:\1:\3/; s/\([^:]*\): \([^<]*.*\)/Misc.:\1:\2/' $(MAKEFILE_LIST) | \
 	sort -t: -d | \
 	awk 'BEGIN{FS=":"; section=""} { if ($$1 != section) { section=$$1; printf "\n\033[1m%s\033[0m\n", $$1 } printf "\t\033[92m%s\033[0m:%s\n", $$2, $$3 }' | \
 	column -c2 -t -s :
