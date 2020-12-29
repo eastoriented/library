@@ -2,3 +2,4 @@
 /vendor/
 /bin/
 /*.zip
+/.do_not_touch/config.mk
