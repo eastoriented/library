@@ -80,10 +80,10 @@ bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml ## Creat
 vendor: vendor/autoload.php  ## <Install> Create `vendor` directory
 
 vendor/autoload.php: composer.lock | bin/composer
-	bin/composer install --no-suggest
+	bin/composer install
 
 vendor/update: | bin/composer ## <Update> Update `vendor` directory
-	bin/composer update --no-suggest
+	bin/composer update
 	./vendor/bin/eastoriented-library install
 
 .PHONY: autoload
