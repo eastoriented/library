@@ -77,9 +77,9 @@ bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml ## Creat
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
 	chmod u+x $@
 
-vendor: vendor/autoload.php ## <Update> Update `vendor` directory
+vendor: vendor/autoload.php  ## <Install> Create `vendor` directory
 
-vendor/autoload.php: composer.lock | bin/composer ## <Install> Create `vendor` directory
+vendor/autoload.php: composer.lock | bin/composer
 	bin/composer install --no-suggest
 
 vendor/update: | bin/composer ## <Update> Update `vendor` directory
