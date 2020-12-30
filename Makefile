@@ -94,7 +94,7 @@ bin/php: | docker-compose.yml bin/. $(DOCKER_COMPOSE)
 	$(call binary,$@,php-cli,php)
 
 bin/atoum: | bin/. .atoum.php bin/composer $(DOCKER_COMPOSE)
-	bin/composer require --dev --no-suggest atoum/atoum ^4
+	bin/composer require --dev atoum/atoum ^4
 	$(call binary,$@,php-cli,/src/vendor/$@)
 
 bin/composer: | docker-compose.yml bin/. .env $(DOCKER_COMPOSE)
