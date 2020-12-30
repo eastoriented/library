@@ -3,7 +3,7 @@ RESOURCES_DIR := $(THIS_DIR)/resources
 MKDIR=mkdir -p
 RM=rm -rf
 DOCKER_COMPOSE=$(shell which docker-compose || echo 'bin/docker-compose')
-CI_CONFIG_FILE?=.travis.yml
+CI_CONFIG_FILE?=.github/workflows/tests.yml
 
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
@@ -72,6 +72,9 @@ LICENCE:
 .travis.yml:
 	cp $(RESOURCES_DIR)/$@ $@
 
+.github/workflows/tests.yml: .github/workflows/.
+	cp $(RESOURCES_DIR)/.github/workflows/tests.yml $^
+
 .gitlab-ci.yml:
 	cp $(RESOURCES_DIR)/$@ $@
 
@@ -82,7 +85,7 @@ bin/php: | docker-compose.yml bin/. $(DOCKER_COMPOSE)
 	$(call binary,$@,php-cli,php)
 
 bin/atoum: | bin/. .atoum.php bin/composer $(DOCKER_COMPOSE)
-	bin/composer require --dev --no-suggest atoum/atoum ^3
+	bin/composer require --dev --no-suggest atoum/atoum ^4
 	$(call binary,$@,php-cli,/src/vendor/$@)
 
 bin/composer: | docker-compose.yml bin/. .env $(DOCKER_COMPOSE)

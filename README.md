@@ -24,6 +24,14 @@ By default, a `.travis.yml` file will be created, but if you want a `.gitlab-ci.
 export CI_CONFIG_FILE=.gitlab-ci.yml && wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | sh
 ```
 
+Github Action is also supported:
+
+```
+export CI_CONFIG_FILE=.github/workflows/tests.yml && wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | sh
+```
+
+If you use Github Action, you must define `COVERALLS_REPO_TOKEN` as a [repository secret](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository).
+
 # Update
 
 To retrive the last version, just do `make vendor/update` and commit all updated files.
