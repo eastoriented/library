@@ -3,7 +3,7 @@ RESOURCES_DIR := $(THIS_DIR)/resources
 MKDIR=mkdir -p
 RM=rm -rf
 DOCKER_COMPOSE=$(shell which docker-compose || echo 'bin/docker-compose')
-CI_CONFIG_FILE?=.github/workflows/tests.yml
+CI?=github
 
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
@@ -31,7 +31,7 @@ endef
 %/.:
 	$(MKDIR) $@
 
-install: $(call locate,docker) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md src/. tests/units $(CI_CONFIG_FILE)
+install: $(call locate,docker) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md src/. tests/units $(CI)
 
 .PHONY: git
 git: .git .gitignore .gitattributes .git/hooks/pre-commit
@@ -51,9 +51,6 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 	$(call write,$@,"HOME=$(HOME)")
 	$(call write,$@,"USER_ID=$$(id -u):$$(id -g)")
 
-.atoum.php:
-	cp $(RESOURCES_DIR)/atoum/$@ $@
-
 Makefile:
 	$(call write,$@,include .do_not_touch/Makefile)
 
@@ -69,14 +66,26 @@ README.md:
 LICENCE:
 	cp $(RESOURCES_DIR)/$@ $@
 
+.PHONY: travis
+travis: .travis.yml .atoum.php
+
 .travis.yml:
-	cp $(RESOURCES_DIR)/$@ $@
+	cp $(RESOURCES_DIR)/ci/travis/$@ $@
+
+.PHONY: github
+github: .github/workflows/tests.yml .atoum.php
 
 .github/workflows/tests.yml: .github/workflows/.
-	cp $(RESOURCES_DIR)/.github/workflows/tests.yml $^
+	cp $(RESOURCES_DIR)/ci/github/tests.yml $^
+
+.PHONY: gitlab
+gitlab: .gitlab-ci.yml
 
 .gitlab-ci.yml:
-	cp $(RESOURCES_DIR)/$@ $@
+	cp $(RESOURCES_DIR)/ci/gitlab/$@ $@
+
+.atoum.php:
+	cp $(RESOURCES_DIR)/ci/$(CI)/$@ $@
 
 VERSION:
 	$(call write,$@,\$$Format:%ai\$$ \$$Format:%d\$$ \$$Format:%H\$$)
