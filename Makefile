@@ -67,19 +67,22 @@ LICENCE:
 	cp $(RESOURCES_DIR)/$@ $@
 
 .PHONY: travis
-travis: .travis.yml .atoum.php
+travis: .travis.yml .atoum.php .gitattributes
+	echo ".travis.yml export-ignore" >> .gitattributes
 
 .travis.yml:
 	cp $(RESOURCES_DIR)/ci/travis/$@ $@
 
 .PHONY: github
-github: .github/workflows/tests.yml .atoum.php
+github: .github/workflows/tests.yml .atoum.php .gitattributes
+	echo ".github export-ignore" >> .gitattributes
 
 .github/workflows/tests.yml: .github/workflows/.
 	cp $(RESOURCES_DIR)/ci/github/tests.yml $^
 
 .PHONY: gitlab
-gitlab: .gitlab-ci.yml
+gitlab: .gitlab-ci.yml .gitattributes
+	echo ".gitlab-ci.yml export-ignore" >> .gitattributes
 
 .gitlab-ci.yml:
 	cp $(RESOURCES_DIR)/ci/gitlab/$@ $@
