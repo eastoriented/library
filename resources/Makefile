@@ -71,21 +71,21 @@ install: $(call locate,docker) bin/php bin/composer ## <Install> Install develop
 	$(call write,$@,"HOME=$(HOME)")
 	$(call write,$@,"USER_ID=$$(id -u):$$(id -g)")
 
-bin/php: | docker-compose.yml bin/. $(DOCKER_COMPOSE) ## <Install> Create wrapper for `php` using `docker`
+bin/php: | docker-compose.yml bin/. $(DOCKER_COMPOSE) ## <Binaries> Create wrapper for `php` using `docker`
 	$(call binary,$@,php,php)
 
 bin/atoum: | docker-compose.yml bin/. .atoum.php vendor $(DOCKER_COMPOSE) ## <Binaries> Create wrapper for `atoum` using `docker`
 	$(call binary,$@,php,/src/vendor/$@)
 
-bin/composer: | docker-compose.yml bin/. .env $(DOCKER_COMPOSE) ## <Install> Create wrapper for `composer` using `docker`
+bin/composer: | docker-compose.yml bin/. .env $(DOCKER_COMPOSE) ## <Binaries> Create wrapper for `composer` using `docker`
 	$(call binary,$@,composer,composer)
 
-bin/docker-compose: DOCKER_COMPOSE_VERSION=$(shell curl --silent "https://api.github.com/repos/docker/compose/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"([^"]+)".*/\1/') ## <Install> Create wrapper for `docker-compose` using `docker`
-bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml ## Create wrapper for `docker-compose` using `docker`
+bin/docker-compose: DOCKER_COMPOSE_VERSION=$(shell curl --silent "https://api.github.com/repos/docker/compose/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"([^"]+)".*/\1/')
+bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml  ## <Binaries> Create wrapper for `docker-compose` using `docker`
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
 	chmod u+x $@
 
-vendor: vendor/autoload.php  ## <Install> Create `vendor` directory
+vendor: vendor/autoload.php  ## <Install> Create or recreate `vendor` directory
 
 vendor/autoload.php: composer.lock | bin/composer
 	bin/composer install
