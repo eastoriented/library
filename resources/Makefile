@@ -119,6 +119,10 @@ php/%: | bin/composer ## <Environment> Switch PHP version, for example `make php
 	@: $(if $(findstring $*,$(INSTALLED_PHP_VERSION)),,$(error PHP version $* is invalid, valid versions are $(INSTALLED_PHP_VERSION)))
 	$(call switch-php,$*)
 
+.PHONY: php/versions
+php/versions:
+	echo "Available PHP versions are $(INSTALLED_PHP_VERSION)"
+
 .PHONY: help
 help: ## <Help> Display this help.
 	sed -e '/#\{2\} /!d; s/:[^#]*##/:/; s/\([^:]*\): <\([^>]*\)> \(.*\)/\2:\1:\3/; s/\([^:]*\): \([^<]*.*\)/Misc.:\1:\2/' $(MAKEFILE_LIST) | \
