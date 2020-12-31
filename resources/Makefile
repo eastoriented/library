@@ -49,7 +49,7 @@ echo $2 >> $1
 endef
 
 define switch-php
-cat .env | grep -v PHP_VERSION > .env.php-$1 && $(MV) .env.php-$1 .env
+cat .env | grep -v PHP_VERSION | tee .env > /dev/null
 $(call write,.env,"PHP_VERSION=$1");
 bin/composer install
 endef

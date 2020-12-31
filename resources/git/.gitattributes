@@ -1,5 +1,4 @@
 VERSION export-subst
-
 .gitattributes export-ignore
 .gitignore export-ignore
 Makefile export-ignore

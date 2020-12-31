@@ -20,6 +20,10 @@ define write
 echo $2 >> $1
 endef
 
+define uniq
+cat $1 | sort | uniq | tee $1 > /dev/null
+endef
+
 .SILENT:
 
 .SUFFIXES:
@@ -39,8 +43,8 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 .git: $(call locate,git)
 	git init
 
-.git%:
-	cp $(RESOURCES_DIR)/git/$@ $@
+.git%: $(RESOURCES_DIR)/git/.git%
+	cat $(RESOURCES_DIR)/git/$@ >> $@ && $(call uniq,$@)
 
 .git/hooks/pre-commit:
 	$(call write,$@,'#!/usr/bin/env sh')
@@ -68,21 +72,21 @@ LICENCE:
 
 .PHONY: travis
 travis: .travis.yml .atoum.php .gitattributes
-	echo ".travis.yml export-ignore" >> .gitattributes
+	echo ".travis.yml export-ignore" >> .gitattributes && $(call uniq,.gitattributes)
 
 .travis.yml:
 	cp $(RESOURCES_DIR)/ci/travis/$@ $@
 
 .PHONY: github
 github: .github/workflows/tests.yml .atoum.php .gitattributes
-	echo ".github export-ignore" >> .gitattributes
+	echo ".github export-ignore" >> .gitattributes && $(call uniq,.gitattributes)
 
 .github/workflows/tests.yml: .github/workflows/.
 	cp $(RESOURCES_DIR)/ci/github/tests.yml $^
 
 .PHONY: gitlab
 gitlab: .gitlab-ci.yml .gitattributes
-	echo ".gitlab-ci.yml export-ignore" >> .gitattributes
+	echo ".gitlab-ci.yml export-ignore" >> .gitattributes && $(call uniq,.gitattributes)
 
 .gitlab-ci.yml:
 	cp $(RESOURCES_DIR)/ci/gitlab/$@ $@
