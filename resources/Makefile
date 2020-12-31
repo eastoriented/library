@@ -120,7 +120,7 @@ php/%: | bin/composer ## <Environment> Switch PHP version, for example `make php
 	$(call switch-php,$*)
 
 .PHONY: php/versions
-php/versions:
+php/versions: ## <Environment> Display all available PHP versions
 	echo "Available PHP versions are $(INSTALLED_PHP_VERSION)"
 
 .PHONY: help
