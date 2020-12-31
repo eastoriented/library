@@ -72,10 +72,10 @@ install: $(call locate,docker) bin/php bin/composer ## <Install> Install develop
 	$(call write,$@,"USER_ID=$$(id -u):$$(id -g)")
 
 bin/php: | docker-compose.yml bin/. $(DOCKER_COMPOSE) ## <Install> Create wrapper for `php` using `docker`
-	$(call binary,$@,php-cli,php)
+	$(call binary,$@,php,php)
 
-bin/atoum: | docker-compose.yml bin/. .atoum.php vendor $(DOCKER_COMPOSE) ## <Install> Create wrapper for `atoum` using `docker`
-	$(call binary,$@,php-cli,/src/vendor/$@)
+bin/atoum: | docker-compose.yml bin/. .atoum.php vendor $(DOCKER_COMPOSE) ## <Binaries> Create wrapper for `atoum` using `docker`
+	$(call binary,$@,php,/src/vendor/$@)
 
 bin/composer: | docker-compose.yml bin/. .env $(DOCKER_COMPOSE) ## <Install> Create wrapper for `composer` using `docker`
 	$(call binary,$@,composer,composer)

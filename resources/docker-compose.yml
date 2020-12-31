@@ -22,21 +22,21 @@ services:
       working_dir: /src
 
    php-7.1:
-      image: php:7.1-cli
+      image: php:7.1
 
    php-7.2:
-      image: php:7.2-cli
+      image: php:7.2
 
    php-7.3:
-      image: php:7.3-cli
+      image: php:7.3
 
    php-7.4:
-      image: php:7.4-cli
+      image: php:7.4
 
    php-8.0:
-      image: php:8.0-cli
+      image: php:8.0
 
-   php-cli:
+   php:
       extends:
          service: php-${PHP_VERSION:-8.0}
       network_mode: bridge

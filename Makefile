@@ -91,11 +91,11 @@ VERSION:
 	$(call write,$@,\$$Format:%ai\$$ \$$Format:%d\$$ \$$Format:%H\$$)
 
 bin/php: | docker-compose.yml bin/. $(DOCKER_COMPOSE)
-	$(call binary,$@,php-cli,php)
+	$(call binary,$@,php,php)
 
 bin/atoum: | bin/. .atoum.php bin/composer $(DOCKER_COMPOSE)
 	bin/composer require --dev atoum/atoum ^4
-	$(call binary,$@,php-cli,/src/vendor/$@)
+	$(call binary,$@,php,/src/vendor/$@)
 
 bin/composer: | docker-compose.yml bin/. .env $(DOCKER_COMPOSE)
 	$(call binary,$@,composer,composer)
