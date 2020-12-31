@@ -58,7 +58,7 @@ Makefile:
 	cp $(RESOURCES_DIR)/Makefile $@
 
 .do_not_touch/config.mk: | .do_not_touch/.
-	$(call write,$@,"CI_CONFIG_FILE=$(CI_CONFIG_FILE)")
+	$(call write,$@,"CI=$(CI)")
 
 README.md:
 	cp $(RESOURCES_DIR)/$@ $@
