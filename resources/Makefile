@@ -15,12 +15,14 @@ else
 
 include .do_not_touch/config.mk
 
-THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-RESOURCES_DIR := $(THIS_DIR)/resources
-MKDIR=mkdir -p
-RM=rm -rf
+THIS_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+RESOURCES_DIR:=$(THIS_DIR)/resources
+MKDIR:=mkdir -p
+RM:=rm -rf
+MV:=mv -f
 DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
 CURRENT_VERSION:=$(shell git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)
+INSTALLED_PHP_VERSION:=$(shell grep -e "\s\+php-\([0-9][^:]\+\)" docker-compose.yml 2>/dev/null | cut -d: -f1 | cut -d- -f2 || true)
 
 ifneq ($(WITH_DEBUG),)
 OLD_SHELL := $(SHELL)
@@ -44,6 +46,12 @@ endef
 
 define write
 echo $2 >> $1
+endef
+
+define switch-php
+cat .env | grep -v PHP_VERSION > .env.php-$1 && $(MV) .env.php-$1 .env
+$(call write,.env,"PHP_VERSION=$1");
+bin/composer install
 endef
 
 .SILENT:
@@ -105,6 +113,11 @@ version/new/minor: | $(DOCKER_COMPOSE) ## <Versioning> Create tag for new minor 
 .PHONY: version/new/patch
 version/new/patch: | $(DOCKER_COMPOSE) ## <Versioning> Create tag for new patch version
 	$(call semver,patch)
+
+.PHONY: php/%
+php/%: | bin/composer ## <Environment> Switch PHP version, for example `make php/7.2`
+	@: $(if $(findstring $*,$(INSTALLED_PHP_VERSION)),,$(error PHP version $* is invalid, valid versions are $(INSTALLED_PHP_VERSION)))
+	$(call switch-php,$*)
 
 .PHONY: help
 help: ## <Help> Display this help.

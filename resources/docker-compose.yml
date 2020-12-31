@@ -1,14 +1,6 @@
-version: '2.1'
+version: '2.4'
 
 services:
-   php-cli:
-      network_mode: bridge
-      image: php:8.0-cli
-      user: ${USER_ID}
-      volumes:
-         - .:/src
-      working_dir: /src
-
    composer:
       network_mode: bridge
       image: composer:latest
@@ -24,6 +16,30 @@ services:
    semver:
       network_mode: bridge
       image: marcelocorreia/semver:latest
+      user: ${USER_ID}
+      volumes:
+         - .:/src
+      working_dir: /src
+
+   php-7.1:
+      image: php:7.1-cli
+
+   php-7.2:
+      image: php:7.2-cli
+
+   php-7.3:
+      image: php:7.3-cli
+
+   php-7.4:
+      image: php:7.4-cli
+
+   php-8.0:
+      image: php:8.0-cli
+
+   php-cli:
+      extends:
+         service: php-${PHP_VERSION:-8.0}
+      network_mode: bridge
       user: ${USER_ID}
       volumes:
          - .:/src
