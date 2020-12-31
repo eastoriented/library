@@ -1,8 +1,8 @@
-THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-RESOURCES_DIR := $(THIS_DIR)/resources
-MKDIR=mkdir -p
-RM=rm -rf
-DOCKER_COMPOSE=$(shell which docker-compose || echo 'bin/docker-compose')
+THIS_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+RESOURCES_DIR:=$(THIS_DIR)/resources
+MKDIR:=mkdir -p
+RM:=rm -rf
+DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
 CI?=github
 
 define locate
