@@ -22,7 +22,7 @@ RM:=rm -rf
 MV:=mv -f
 DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
 CURRENT_VERSION:=$(shell git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)
-INSTALLED_PHP_VERSION:=$(shell grep -e "\s\+php-\([0-9][^:]\+\)" docker-compose.yml 2>/dev/null | cut -d: -f1 | cut -d- -f2 || true)
+INSTALLED_PHP_VERSION:=$(shell grep -e "^\s\+php-\([^:]\+\)" docker-compose.yml docker-compose.override.yml 2>/dev/null | cut -d: -f2 | cut -d- -f2 | sort | uniq || true)
 
 ifneq ($(WITH_DEBUG),)
 OLD_SHELL := $(SHELL)
