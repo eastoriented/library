@@ -11,6 +11,7 @@ MKDIR:=mkdir -p
 RM:=rm -rf
 DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
 CI?=github
+PHP_EDITOR?=unsupported
 
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
@@ -43,7 +44,7 @@ endef
 %/.:
 	$(MKDIR) $@
 
-install: $(call locate,docker) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md src/. tests/units $(CI)
+install: $(call locate,docker) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md src/. tests/units $(CI) $(PHP_EDITOR)
 
 .PHONY: git
 git: .git .gitignore .gitattributes .git/hooks/pre-commit
@@ -79,21 +80,21 @@ LICENCE:
 	cp $(RESOURCES_DIR)/$@ $@
 
 .PHONY: travis
-travis: .travis.yml .atoum.php .gitattributes
+travis: .travis.yml .atoum.php .gitattributes $(THIS_MAKEFILE)
 	echo ".travis.yml export-ignore" >> .gitattributes && $(call uniq,.gitattributes)
 
 .travis.yml:
 	cp $(RESOURCES_DIR)/ci/travis/$@ $@
 
 .PHONY: github
-github: .github/workflows/tests.yml .atoum.php .gitattributes
+github: .github/workflows/tests.yml .atoum.php .gitattributes $(THIS_MAKEFILE)
 	echo ".github export-ignore" >> .gitattributes && $(call uniq,.gitattributes)
 
 .github/workflows/tests.yml: .github/workflows/.
 	cp $(RESOURCES_DIR)/ci/github/tests.yml $^
 
 .PHONY: gitlab
-gitlab: .gitlab-ci.yml .gitattributes
+gitlab: .gitlab-ci.yml .gitattributes $(THIS_MAKEFILE)
 	echo ".gitlab-ci.yml export-ignore" >> .gitattributes && $(call uniq,.gitattributes)
 
 .gitlab-ci.yml:
@@ -101,6 +102,19 @@ gitlab: .gitlab-ci.yml .gitattributes
 
 .atoum.php:
 	cp $(RESOURCES_DIR)/ci/$(CI)/$@ $@
+
+.PHONY: unsupported
+unsupported:
+	true
+
+.PHONY: vim
+vim: .lvimrc .atoum.php.vim
+
+.lvimrc: $(RESOURCES_DIR)/.lvimrc
+	cp $(RESOURCES_DIR)/$@ $@
+
+.atoum.php.vim: $(RESOURCES_DIR)/.atoum.php.vim
+	cp $(RESOURCES_DIR)/$@ $@
 
 VERSION:
 	$(call write,$@,\$$Format:%ai\$$ \$$Format:%d\$$ \$$Format:%H\$$)

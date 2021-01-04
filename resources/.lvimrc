@@ -1,0 +1,59 @@
+" File used by VIM plugin https://github.com/embear/vim-localvimrc
+
+"" PHP
+" Namespace for current project, do not omit to escape `\` like this: `eastoriented\\php\\block`
+let b:namespace = "your\\php\\namepsace\\here"
+
+"" Atoum
+" Comments  these lines if you do not use atoum, see https://github.com/atoum/atoum for more information
+let g:atoum#php = "./bin/php"
+let g:atoum#configuration = ".atoum.php.vim"
+
+if ! exists('g:localvimrc_sourced_once')
+
+" Functions to automaticaly fill files  with namespace and require according to current directory
+function! s:PHPTestHeader(path, namespace)
+	if (line('$') == 1 && getline(1) == '')
+		let tld = substitute(substitute(fnamemodify(a:path, ':h'), 'tests/units/src', '', ''), '/', '\', 'g')
+		let splitedTld = split(tld, '\')
+
+		call append(0, '<?php namespace ' . a:namespace . '\tests\units' . tld . ';')
+		call append(1, '')
+		call append(2, 'require __DIR__ . ''/' . repeat('../', (len(splitedTld)) + 1) . 'runner.php'';')
+		call append(3, '')
+		call append(4, 'use eastoriented\tests\units;')
+		call append(5, '')
+		call append(6, 'class ' . fnamemodify(a:path, ':t:r') . ' extends units\test')
+		call append(7, '{')
+		call append(8, '}')
+		:$d
+		:$
+		normal zo
+		normal O
+	endif
+endfunction
+
+function! s:PHPScriptHeader(path, namespace)
+	if (line('$') == 1 && getline(1) == '')
+		let tld = substitute(substitute(fnamemodify(a:path, ':h'), 'src', '', ''), '/', '\', 'g')
+
+		call append(0, '<?php namespace ' . a:namespace . tld . ';')
+		call append(1, '')
+		call append(2, 'class ' . fnamemodify(a:path, ':t:r'))
+		call append(3, '{')
+		call append(4, '}')
+		:$d
+		:$
+		normal zo
+		normal O
+	endif
+endfunction
+
+" Augroup used to put header in new files in `src` and `tests/units/src` automaticaly
+exec 'augroup ' . substitute(b:namespace, '\\', '-', 'g')
+exec 'au!'
+exec "au! BufEnter " . getcwd() . "/tests/units/src/* call <SID>PHPTestHeader(expand('<afile>'), '" . b:namespace . "')"
+exec "au! BufEnter " . getcwd() . "/src/* call <SID>PHPScriptHeader(expand('<afile>'), '" . b:namespace . "')"
+exec 'augroup end'
+
+endif
