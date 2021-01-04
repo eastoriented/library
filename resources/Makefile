@@ -5,6 +5,13 @@
 #
 # Have a good day!
 #
+#
+# Disable builtin rules and variables, because they are useless in our context and add lot of noise when `make -d` is used to debug the macfly.
+MAKEFLAGS+= --no-builtin-rules
+MAKEFLAGS+= --no-builtin-variables
+
+.DEFAULT_GOAL:=help
+
 ifeq "$(firstword $(MAKECMDGOALS))" "verbose"
 
 .PHONY: verbose

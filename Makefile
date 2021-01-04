@@ -1,3 +1,9 @@
+# Disable builtin rules and variables, because they are useless in our context and add lot of noise when `make -d` is used to debug the macfly.
+MAKEFLAGS+= --no-builtin-rules
+MAKEFLAGS+= --no-builtin-variables
+
+.DEFAULT_GOAL:=help
+
 THIS_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 RESOURCES_DIR:=$(THIS_DIR)/resources
 MKDIR:=mkdir -p
