@@ -23,6 +23,7 @@ else
 include .do_not_touch/config.mk
 
 THIS_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+THIS_MAKEFILE=$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 RESOURCES_DIR:=$(THIS_DIR)/resources
 MKDIR:=mkdir -p
 RM:=rm -rf
@@ -41,9 +42,10 @@ $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!)
 endef
 
 define binary
+$(RM) $1
 $(call write,$1,'#!/usr/bin/env sh')
 $(call write,$1,'set -e')
-$(call write,$1,'exec $(DOCKER_COMPOSE) run --rm $2 $3 "$$@"')
+$(call write,$1,'exec $(DOCKER_COMPOSE) run --rm $2 $3 "$$@" 2>/dev/null')
 chmod u+x $1
 endef
 
@@ -78,13 +80,13 @@ install: $(call locate,docker) bin/php bin/composer ## <Install> Install develop
 	$(call write,$@,"HOME=$(HOME)")
 	$(call write,$@,"USER_ID=$$(id -u):$$(id -g)")
 
-bin/php: | docker-compose.yml bin/. $(DOCKER_COMPOSE) ## <Binaries> Create wrapper for `php` using `docker`
+bin/php: $(THIS_MAKEFILE) | docker-compose.yml bin/. $(DOCKER_COMPOSE) ## <Binaries> Create wrapper for `php` using `docker`
 	$(call binary,$@,php,php)
 
-bin/atoum: | docker-compose.yml bin/. .atoum.php vendor $(DOCKER_COMPOSE) ## <Binaries> Create wrapper for `atoum` using `docker`
+bin/atoum: $(THIS_MAKEFILE) | docker-compose.yml bin/. .atoum.php vendor $(DOCKER_COMPOSE) ## <Binaries> Create wrapper for `atoum` using `docker`
 	$(call binary,$@,php,/src/vendor/$@)
 
-bin/composer: | docker-compose.yml bin/. .env $(DOCKER_COMPOSE) ## <Binaries> Create wrapper for `composer` using `docker`
+bin/composer: $(THIS_MAKEFILE) | docker-compose.yml bin/. .env $(DOCKER_COMPOSE) ## <Binaries> Create wrapper for `composer` using `docker`
 	$(call binary,$@,composer,composer)
 
 bin/docker-compose: DOCKER_COMPOSE_VERSION=$(shell curl --silent "https://api.github.com/repos/docker/compose/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"([^"]+)".*/\1/')
