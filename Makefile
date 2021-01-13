@@ -135,8 +135,12 @@ bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
 	chmod u+x $@
 
-docker-compose.yml: $(RESOURCES_DIR)/docker-compose.yml
-	cp $(RESOURCES_DIR)/docker-compose.yml $@
+docker-compose.yml: $(DOCKER_COMPOSE_DEPENDENCIES) .env docker-compose.override.yml
+	echo "# DO NOT MODIFY THIS FILE, please put your specific docker-compose configuration in docker-compose.override.yml" > $@
+	$(DOCKER_COMPOSE) -f .do_not_touch/docker-compose.yml $$(find .do_not_touch -type f -name "docker-compose.*.yml" -exec echo "-f {}" \; | xargs) config >> $@
+
+docker-compose.override.yml:
+	cp $(RESOURCES_DIR)/$@ $@
 
 tests/units: tests/units/runner.php tests/units/test.php tests/units/src
 
