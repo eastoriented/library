@@ -5,13 +5,45 @@ MAKEFLAGS+= --no-builtin-variables
 .DEFAULT_GOAL:=help
 
 THIS_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-THIS_MAKEFILE=$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+THIS_MAKEFILE=$(firstword $(MAKEFILE_LIST))
 RESOURCES_DIR:=$(THIS_DIR)/resources
 MKDIR:=mkdir -p
 RM:=rm -rf
+CP:=cp -r
 DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
-CI?=github
-PHP_EDITOR?=unsupported
+
+-include .do_not_touch/config.mk
+
+INSTALL_DEPENDENCIES:=$(call locate,docker) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md src/. tests/units
+DOCKER_COMPOSE_DEPENDENCIES:=.do_not_touch/docker-compose.yml
+
+WITH_GITHUB?=true
+ifneq ($(strip $(WITH_GITHUB)),)
+CI:=github
+endif
+
+WITH_GITLAB?=
+ifneq ($(strip $(WITH_GITLAB)),)
+CI:=gitlab
+endif
+
+WITH_TRAVIS?=
+ifneq ($(strip $(WITH_TRAVIS)),)
+CI:=travis
+endif
+
+WITH_VIM?=
+ifneq ($(strip $(WITH_VIM)),)
+INSTALL_DEPENDENCIES+= vim
+endif
+
+WITH_SSH?=
+ifneq ($(strip $(WITH_SSH)),)
+INSTALL_DEPENDENCIES+= ssh
+DOCKER_COMPOSE_DEPENDENCIES+= .do_not_touch/docker-compose.ssh.yml .passwd
+endif
+
+INSTALL_DEPENDENCIES+= $(CI)
 
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
@@ -45,7 +77,7 @@ endef
 %/.:
 	$(MKDIR) $@
 
-install: $(call locate,docker) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md src/. tests/units $(CI) $(PHP_EDITOR)
+install: $(INSTALL_DEPENDENCIES)
 
 .PHONY: git
 git: .git .gitignore .gitattributes .git/hooks/pre-commit
@@ -68,11 +100,18 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 Makefile:
 	$(call write,$@,include .do_not_touch/Makefile)
 
-.do_not_touch/Makefile: $(RESOURCES_DIR)/Makefile | .do_not_touch/config.mk
+.do_not_touch/Makefile: $(RESOURCES_DIR)/Makefile
 	cp $(RESOURCES_DIR)/Makefile $@
 
-.do_not_touch/config.mk: | .do_not_touch/.
-	$(call write,$@,"CI=$(CI)")
+.do_not_touch/config.mk: $(THIS_MAKEFILE) | .do_not_touch/.
+	$(RM) $@
+	$(call write,$@,"INSTALL_DEPENDENCIES:=$(INSTALL_DEPENDENCIES)")
+
+.do_not_touch/docker-compose.yml: $(RESOURCES_DIR)/docker-compose.yml | .do_not_touch/.
+	cp $(RESOURCES_DIR)/docker-compose.yml $@
+
+.do_not_touch/docker-compose.ssh.yml: $(RESOURCES_DIR)/docker-compose.ssh.yml | .do_not_touch/.
+	cp $(RESOURCES_DIR)/docker-compose.ssh.yml $@
 
 README.md:
 	cp $(RESOURCES_DIR)/$@ $@
@@ -104,17 +143,20 @@ gitlab: .gitlab-ci.yml .gitattributes $(THIS_MAKEFILE)
 .atoum.php:
 	cp $(RESOURCES_DIR)/ci/$(CI)/$@ $@
 
-.PHONY: unsupported
-unsupported:
-	true
-
 .PHONY: vim
 vim: .lvimrc .atoum.php.vim
 
-.lvimrc: $(RESOURCES_DIR)/.lvimrc
+.lvimrc:
 	cp $(RESOURCES_DIR)/$@ $@
 
-.atoum.php.vim: $(RESOURCES_DIR)/.atoum.php.vim
+.PHONY: ssh
+ssh: .passwd
+
+.passwd:
+	$(RM) $@
+	$(call write,$@,root:x:$$(id -u):$$(id -g):root:/:/bin/sh)
+
+.atoum.php.vim:
 	cp $(RESOURCES_DIR)/$@ $@
 
 VERSION:
@@ -129,6 +171,8 @@ bin/atoum: $(THIS_MAKEFILE) | bin/. .atoum.php bin/composer $(DOCKER_COMPOSE)
 
 bin/composer: $(THIS_MAKEFILE) | docker-compose.yml bin/. .env $(DOCKER_COMPOSE)
 	$(call bin,$@,composer,composer,$(MKDIR) \$$HOME/.composer)
+
+$(DOCKER_COMPOSE): docker-compose.yml
 
 bin/docker-compose: DOCKER_COMPOSE_VERSION=$(shell curl --silent "https://api.github.com/repos/docker/compose/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"([^"]+)".*/\1/')
 bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml

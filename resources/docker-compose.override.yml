@@ -1,1 +1,2 @@
 # Put your specific docker-compose configuration here, not in docker-compose.yml
+version: '2.4'

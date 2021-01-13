@@ -7,7 +7,7 @@ services:
       image: composer:latest
       user: ${USER_ID}
       volumes:
-         - .:/src
+         - ..:/src
          - ${HOME}/.composer:/.composer
       working_dir: /src
       environment:
@@ -19,7 +19,7 @@ services:
       image: marcelocorreia/semver:latest
       user: ${USER_ID}
       volumes:
-         - .:/src
+         - ..:/src
       working_dir: /src
 
    php-7.1:
@@ -43,5 +43,5 @@ services:
       network_mode: bridge
       user: ${USER_ID}
       volumes:
-         - .:/src
+         - ..:/src
       working_dir: /src

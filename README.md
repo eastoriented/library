@@ -21,27 +21,39 @@ At end of process, you obtains an arborescence which contains all files needed t
 By default, a github action workflow will be defined, but if you want a `.gitlab-ci.yml`, just do:
 
 ```
-wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | env CI=gitlab sh
+wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | env WITH_GITLAB=true sh
 ```
 
 Travis-CI is also supported:
 
 ```
-wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | env CI=travis sh
+wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | env WITH_TRAVIS=true sh
 ```
 
-If you use Github Action, you must define `COVERALLS_REPO_TOKEN` as a [repository secret](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository).
+If you use Github Action, you must define `COVERALLS_REPO_TOKEN` as a [repository secret](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository).  
 If you use [vim](https://www.vim.org) and [localvimrc](https://github.com/embear/vim-localvimrc), you can do:
 
 ```
-wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | env PHP_EDITOR=vim sh
+wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | env WITH_VIM=true sh
 ```
 
 In this case, you must edit `./.lvimrc` to define PHP namespace, see contents of `.lvimrc` for more informations.
 
+And if you want that `composer` has SSH access on some repositories using your SSH credentials, just do:
+
+```
+wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | env WITH_SSH=true sh
+```
+
+It is possible to mix all `WITH_*` variables:
+
+```
+wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | env WITH_VIM=true WITH_SSH=true WITH_TRAVIS=true sh
+```
+
 # Update
 
-To retrive the last version, just do `make vendor/update` and commit all updated files.
+To retrive the last version, just do `make vendor/update` and commit all updated files in your git repository.
 
 # How to use it?
 

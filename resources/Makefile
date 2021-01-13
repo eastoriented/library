@@ -23,7 +23,7 @@ else
 include .do_not_touch/config.mk
 
 THIS_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-THIS_MAKEFILE=$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+THIS_MAKEFILE=$(firstword $(MAKEFILE_LIST))
 RESOURCES_DIR:=$(THIS_DIR)/resources
 MKDIR:=mkdir -p
 RM:=rm -rf
@@ -61,6 +61,8 @@ endef
 define switch-php
 cat .env | grep -v PHP_VERSION | tee .env > /dev/null
 $(call write,.env,"PHP_VERSION=$1");
+echo "# DO NOT MODIFY THIS FILE, please put your specific docker-compose configuration in docker-compose.override.yml" > docker-compose.yml
+$(DOCKER_COMPOSE) -f .do_not_touch/docker-compose.yml $$(find .do_not_touch -type f -name "docker-compose.*.yml" -exec echo "-f {}" \; | xargs) config >> docker-compose.yml
 bin/composer install
 endef
 
