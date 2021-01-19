@@ -99,7 +99,7 @@ bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml  ## <Bin
 
 vendor: vendor/autoload.php  ## <Install> Create or recreate `vendor` directory
 
-vendor/autoload.php: composer.lock | bin/composer
+vendor/autoload.php: composer.lock composer.json | bin/composer
 	bin/composer install
 
 vendor/update: | bin/composer ## <Update> Update `vendor` directory
@@ -107,7 +107,7 @@ vendor/update: | bin/composer ## <Update> Update `vendor` directory
 	./vendor/bin/eastoriented-library install
 
 .PHONY: autoload
-autoload: composer.json | bin/composer ## <Update> Generate autoload files
+autoload: composer.json composer.lock | bin/composer ## <Update> Generate autoload files
 	bin/composer dump-autoload
 
 .PHONY: tests/units
