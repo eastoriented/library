@@ -34,12 +34,12 @@ services:
    php-7.4:
       image: php:7.4
 
-   php-8.0:
-      image: php:8.0
+   php-8:
+      image: php:8
 
    php:
       extends:
-         service: php-${PHP_VERSION:-8.0}
+         service: php-${PHP_VERSION:-8}
       network_mode: bridge
       user: ${USER_ID}
       volumes:

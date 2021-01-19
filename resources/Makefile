@@ -32,11 +32,6 @@ DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
 CURRENT_VERSION:=$(shell git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)
 INSTALLED_PHP_VERSION:=$(shell grep -e "^\s\+php-\([^:]\+\)" docker-compose.yml docker-compose.override.yml 2>/dev/null | cut -d: -f2 | cut -d- -f2 | sort | uniq || true)
 
-ifneq ($(WITH_DEBUG),)
-OLD_SHELL := $(SHELL)
-SHELL = $(warning $(if $@, Update target $@)$(if $<, from $<)$(if $?, due to $?))$(OLD_SHELL) -x
-endif
-
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
 endef
@@ -66,7 +61,12 @@ $(DOCKER_COMPOSE) -f .do_not_touch/docker-compose.yml $$(find .do_not_touch -typ
 bin/composer install
 endef
 
+ifneq ($(WITH_DEBUG),)
+OLD_SHELL := $(SHELL)
+SHELL = $(warning $(if $@, Update target $@)$(if $<, from $<)$(if $?, due to $?))$(OLD_SHELL) -x
+else
 .SILENT:
+endif
 
 .SUFFIXES:
 

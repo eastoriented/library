@@ -1,0 +1,17 @@
+version: '2.4'
+
+services:
+   php-7.1:
+      build: ../docker/php/7.1
+
+   php-7.2:
+      build: ../docker/php/7.2
+
+   php-7.3:
+      build: ../docker/php/7.3
+
+   php-7.4:
+      build: ../docker/php/7.4
+
+   php-8:
+      build: ../docker/php/8
