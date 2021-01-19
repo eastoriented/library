@@ -78,6 +78,7 @@ endef
 	$(MKDIR) $@
 
 install: $(INSTALL_DEPENDENCIES)
+	$(MAKE) .git/refs/heads/master
 
 .PHONY: git
 git: .git .gitignore .gitattributes .git/hooks/pre-commit
@@ -92,6 +93,9 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 	$(call write,$@,'#!/usr/bin/env sh')
 	$(call write,$@,make tests/units)
 	chmod u+x $@
+
+.git/refs/heads/master:
+	git commit --quiet -n -am "Init done, have a good journey!"
 
 .env:
 	$(call write,$@,"HOME=$(HOME)")
