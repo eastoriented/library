@@ -6,5 +6,3 @@ Makefile export-ignore
 docker-compose.yml export-ignore
 .atoum.php export-ignore
 tests export-ignore
-composer.json export-ignore
-composer.lock export-ignore
