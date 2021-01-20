@@ -28,7 +28,11 @@ And finaly, it provide a `Makefile` to execute tests, update vendor, manage vers
 
 # Requirements
 
-The only requirement to use `eastoriented/library` is [docker](https://docs.docker.com/install/).
+Requirements to use `eastoriented/library` are:
+
+- [docker](https://docs.docker.com/install/);
+- [GNU Make](https://www.gnu.org/software/make/);
+- [git](https://git-scm.com).
 
 # Installation
 
@@ -43,8 +47,8 @@ By default, a github action workflow will be defined, but if you want a `.gitlab
 
 ```
 wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | env WITH_GITLAB=true sh
-```
 
+```
 Travis-CI is also supported:
 
 ```
@@ -79,3 +83,13 @@ To retrive the last version, just do `make vendor/update` and commit all updated
 # How to use it?
 
 Just do `make help` in a terminal.
+
+# Houston, We've got a problem!
+
+In case of problem, try to reinstall in debug mode:
+
+```
+wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.sh | env WITH_DEBUG=true sh | tee install.log
+```
+
+After that, open an [issue](https://github.com/eastoriented/library/issues) and provide contents of file `install.log` 
