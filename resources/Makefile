@@ -145,6 +145,10 @@ php/%: | bin/composer ## <Environment> Switch PHP version, for example `make php
 php/versions: ## <Environment> Display all available PHP versions
 	echo "Available PHP versions are $(INSTALLED_PHP_VERSION)"
 
+.PHONY: session
+session:
+	echo 'export PATH=$$(pwd)/bin:$$PATH'
+
 .PHONY: help
 help: ## <Help> Display this help.
 	sed -e '/#\{2\} /!d; s/:[^#]*##/:/; s/\([^:]*\): <\([^>]*\)> \(.*\)/\2:\1:\3/; s/\([^:]*\): \([^<]*.*\)/Misc.:\1:\2/' $(MAKEFILE_LIST) | \

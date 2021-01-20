@@ -100,3 +100,7 @@ wget -O - https://raw.githubusercontent.com/eastoriented/library/master/install.
 ```
 
 After that, open an [issue](https://github.com/eastoriented/library/issues) and provide contents of file `install.log` 
+
+# Tips
+
+The command `eval $(make session)` add the `bin` directory to your path for your current shell session, so you can do `php -v` and `bin/php` will be called transparently.
