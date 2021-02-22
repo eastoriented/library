@@ -18,6 +18,9 @@ ifeq "$(firstword $(MAKECMDGOALS))" "verbose"
 verbose: ## <Debug> Display all executed commands during targets building
 	$(MAKE) $(filter-out verbose,$(MAKECMDGOALS)) WITH_DEBUG=TRUE
 
+%:
+	true
+
 else
 
 include .do_not_touch/config.mk
