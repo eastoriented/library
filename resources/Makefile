@@ -138,6 +138,10 @@ releases/$(VERSION).tgz: ./.git/HEAD | ./bin/composer ./releases. ## Create a ta
 	cd ./releases/tmp && tar czpf ../$(VERSION).tgz .
 	$(RM) ./tmp
 
+.PHONY: docker/pull
+docker/pull: $(DOCKER_COMPOSE)
+	$(DOCKER_COMPOSE) pull
+
 .PHONY: php/%
 php/%: | bin/composer ## <Environment> Switch PHP version, for example `make php/7.2`
 	@: $(if $(findstring $*,$(INSTALLED_PHP_VERSION)),,$(error PHP version $* is invalid, valid versions are $(INSTALLED_PHP_VERSION)))
