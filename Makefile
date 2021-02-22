@@ -14,7 +14,7 @@ DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
 
 -include .do_not_touch/config.mk
 
-INSTALL_DEPENDENCIES:=$(call locate,docker) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md src/. tests/units
+INSTALL_DEPENDENCIES:=$(call locate,docker) $(call locate,git) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md CHANGELOG.md src/. tests/units
 DOCKER_COMPOSE_DEPENDENCIES:=.do_not_touch/docker-compose.yml
 
 WITH_GITHUB?=true
@@ -129,8 +129,8 @@ Makefile:
 .do_not_touch/docker-compose.%.yml: $(RESOURCES_DIR)/docker-compose.%.yml | .do_not_touch/.
 	cp $(RESOURCES_DIR)/docker-compose.$*.yml $@
 
-README.md:
-	cp $(RESOURCES_DIR)/$@ $@
+%.md:
+	cp $(RESOURCES_DIR)/$*.md $@
 
 LICENCE:
 	cp $(RESOURCES_DIR)/$@ $@
