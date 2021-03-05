@@ -104,6 +104,7 @@ bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml  ## <Bin
 vendor: composer.lock composer.json | bin/composer ## <Install> Create or recreate `vendor` directory
 	bin/composer install
 
+.PHONY: vendor/update
 vendor/update: | bin/composer ## <Update> Update `vendor` directory
 	bin/composer update
 	./vendor/bin/eastoriented-library install
