@@ -163,10 +163,15 @@ gitlab: .gitlab-ci.yml .gitattributes $(THIS_MAKEFILE)
 	cp $(RESOURCES_DIR)/ci/$(CI)/$@ $@
 
 .PHONY: vim
-vim: .lvimrc .atoum.php.vim
+vim: .lvimrc
 
-.lvimrc:
+.lvimrc: .atoum.vim.php
 	cp $(RESOURCES_DIR)/$@ $@
+
+.atoum.vim.php: GITIGNORE_FILE?=$(shell git config --global --get core.excludesfile || echo $$HOME/.config/git/ignore)
+.atoum.vim.php:
+	cp $(RESOURCES_DIR)/$@ $@
+	grep -q .atoum.vim.php $(GITIGNORE_FILE) || echo '.atoum.vim.php' >> $(GITIGNORE_FILE)
 
 .PHONY: ssh
 ssh: .passwd
@@ -174,9 +179,6 @@ ssh: .passwd
 .passwd:
 	$(RM) $@
 	$(call write,$@,root:x:$$(id -u):$$(id -g):root:/:/bin/sh)
-
-.atoum.php.vim:
-	cp $(RESOURCES_DIR)/$@ $@
 
 VERSION:
 	$(call write,$@,\$$Format:%ai\$$ \$$Format:%d\$$ \$$Format:%H\$$)
