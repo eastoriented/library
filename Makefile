@@ -4,8 +4,21 @@ MAKEFLAGS+= --no-builtin-variables
 
 .DEFAULT_GOAL:=help
 
-THIS_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 THIS_MAKEFILE=$(firstword $(MAKEFILE_LIST))
+
+ifeq "$(firstword $(MAKECMDGOALS))" "verbose"
+
+.PHONY: verbose
+verbose:
+	$(info <-- Start of verbose make -->)
+	$(MAKE) -f $(THIS_MAKEFILE) $(filter-out verbose,$(MAKECMDGOALS)) WITH_DEBUG=TRUE
+
+%:
+	$(info <-- End of verbose make -->)
+
+else
+
+THIS_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 RESOURCES_DIR:=$(THIS_DIR)/resources
 MKDIR:=mkdir -p
 RM:=rm -rf
@@ -216,3 +229,8 @@ tests/units/runner.php: | bin/atoum tests/units/.
 
 tests/units/test.php: | bin/atoum tests/units/.
 	cp -r $(RESOURCES_DIR)/atoum/$@ $@
+
+.PHONY: verbose
+verbose:
+	$(error Verbose syntax is `make verbose <target>`, not `make <target> verbose`)
+endif
