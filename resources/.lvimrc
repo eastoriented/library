@@ -5,7 +5,7 @@
 let b:namespace = "your\\php\\namepsace\\here"
 
 "" Atoum
-" Comments  these lines if you do not use atoum, see https://github.com/atoum/atoum for more information
+" Comments these lines if you do not use atoum, see https://github.com/atoum/atoum for more information
 let g:atoum#php = "./bin/php"
 let g:atoum#strip = ""
 let g:atoum#configuration = ".atoum.vim.php"
