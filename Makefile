@@ -211,7 +211,7 @@ bin/composer: $(THIS_MAKEFILE) | .env docker-compose.yml bin/. .env $(DOCKER_COM
 $(DOCKER_COMPOSE): docker-compose.yml
 
 bin/docker-compose: DOCKER_COMPOSE_VERSION=$(shell curl --silent "https://api.github.com/repos/docker/compose/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"([^"]+)".*/\1/')
-bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml
+bin/docker-compose: $(THIS_MAKEFILE) | $(call locate,curl) bin/. .env docker-compose.yml
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
 	chmod u+x $@
 
