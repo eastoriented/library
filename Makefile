@@ -127,7 +127,8 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 	$(call write,$@,"HOME=$(HOME)")
 	$(call write,$@,"USER_ID=$$(id -u):$$(id -g)")
 
-Makefile:
+Makefile: $(THIS_MAKEFILE)
+	$(RM) $@
 	$(call write,$@,include .do_not_touch/Makefile)
 
 .do_not_touch/Makefile: $(RESOURCES_DIR)/Makefile
