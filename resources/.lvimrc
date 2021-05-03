@@ -53,8 +53,8 @@ endfunction
 " Augroup used to put header in new files in `src` and `tests/units/src` automaticaly
 exec 'augroup ' . substitute(b:namespace, '\\', '-', 'g')
 exec 'au!'
-exec "au! BufEnter " . getcwd() . "/tests/units/src/* call <SID>PHPTestHeader(expand('<afile>'), '" . b:namespace . "')"
-exec "au! BufEnter " . getcwd() . "/src/* call <SID>PHPScriptHeader(expand('<afile>'), '" . b:namespace . "')"
+exec "au! BufEnter tests/units/src/* call <SID>PHPTestHeader(expand('<afile>'), '" . b:namespace . "')"
+exec "au! BufEnter src/* call <SID>PHPScriptHeader(expand('<afile>'), '" . b:namespace . "')"
 exec 'augroup end'
 
 endif
