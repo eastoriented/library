@@ -122,7 +122,8 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 	git add -A
 	git commit --quiet -n -m "Init done, have a good journey!"
 
-.env:
+.env: .do_not_touch/docker-compose.yml
+	$(RM) $@
 	$(call write,$@,"HOME=$(HOME)")
 	$(call write,$@,"USER_ID=$$(id -u):$$(id -g)")
 
