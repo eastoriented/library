@@ -27,7 +27,7 @@ DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
 
 -include .do_not_touch/config.mk
 
-INSTALL_DEPENDENCIES:=$(call locate,docker) $(call locate,git) bin/php bin/composer git Makefile .do_not_touch/Makefile VERSION LICENCE README.md CHANGELOG.md src/. tests/units
+INSTALL_DEPENDENCIES:=$(call locate,docker) $(call locate,git) bin/php bin/composer git Makefile .do_not_touch/Makefile docker-compose.yml VERSION LICENCE README.md CHANGELOG.md src/. tests/units
 DOCKER_COMPOSE_DEPENDENCIES:=.do_not_touch/docker-compose.yml
 
 WITH_GITHUB?=true
@@ -224,13 +224,14 @@ docker-compose.override.yml:
 	cp $(RESOURCES_DIR)/$@ $@
 
 tests/units: tests/units/runner.php tests/units/test.php tests/units/src
+	touch $@
 
 tests/units/src: tests/units/src/.
 
-tests/units/runner.php: | bin/atoum tests/units/.
+tests/units/runner.php: $(RESOURCES_DIR)/atoum/$@ | bin/atoum tests/units/.
 	cp -r $(RESOURCES_DIR)/atoum/$@ $@
 
-tests/units/test.php: | bin/atoum tests/units/.
+tests/units/test.php: $(RESOURCES_DIR)/atoum/$@ | bin/atoum tests/units/.
 	cp -r $(RESOURCES_DIR)/atoum/$@ $@
 
 .PHONY: verbose
