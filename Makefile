@@ -118,7 +118,7 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 	$(call write,$@,make tests/units)
 	chmod u+x $@
 
-.git/refs/heads/master: .git
+.git/refs/heads/master: | .git
 	git add -A
 	git commit --quiet -n -m "Init done, have a good journey!"
 
