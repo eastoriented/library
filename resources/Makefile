@@ -35,6 +35,8 @@ DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
 CURRENT_VERSION:=$(shell git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)
 INSTALLED_PHP_VERSION:=$(shell grep -e "^\s\+php-\([^:]\+\)" docker-compose.yml docker-compose.override.yml 2>/dev/null | cut -d: -f2 | cut -d- -f2 | sort | uniq || true)
 
+DOCKER_COMPOSE_YML=$(shell find .do_not_touch -type f -name "docker-compose.*yml")
+
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
 endef
@@ -60,8 +62,7 @@ endef
 define switch-php
 cat .env | grep -v PHP_VERSION | tee .env > /dev/null
 $(call write,.env,"PHP_VERSION=$1");
-echo "# DO NOT MODIFY THIS FILE, please put your specific docker-compose configuration in docker-compose.override.yml" > docker-compose.yml
-$(DOCKER_COMPOSE) -f .do_not_touch/docker-compose.yml $$(find .do_not_touch -type f -name "docker-compose.*.yml" -exec echo "-f {}" \; | xargs) config >> docker-compose.yml
+$(RM) docker-compose.yml && $(MAKE) docker-compose.yml
 bin/composer install
 endef
 
@@ -87,6 +88,11 @@ install: $(call locate,docker) bin/php bin/composer ## <Install> Install develop
 	$(call write,$@,"HOME=$(HOME)")
 	$(call write,$@,"USER_ID=$$(id -u):$$(id -g)")
 
+docker-compose.yml: $(THIS_MAKEFILE) .env $(DOCKER_COMPOSE_YML)
+	$(RM) $@
+	echo "# DO NOT MODIFY THIS FILE, please put your specific docker-compose configuration in docker-compose.override.yml" > $@
+	$(DOCKER_COMPOSE) -f $$(echo $(DOCKER_COMPOSE_YML) | sed -e 's/ / -f /g') --env-file .env config >> $@
+
 bin/php: $(THIS_MAKEFILE) | docker-compose.yml bin/. $(DOCKER_COMPOSE) ## <Binaries> Create wrapper for `php` using `docker`
 	$(call bin,$@,php,php)
 
@@ -109,6 +115,7 @@ vendor: composer.lock composer.json | bin/composer ## <Install> Create or recrea
 vendor/update: | bin/composer ## <Update> Update `vendor` directory
 	bin/composer update
 	./vendor/bin/eastoriented-library install
+	touch $@
 
 .PHONY: autoload
 autoload: composer.json composer.lock | bin/composer ## <Update> Generate autoload files

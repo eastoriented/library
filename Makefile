@@ -64,6 +64,8 @@ endif
 
 INSTALL_DEPENDENCIES+= $(CI)
 
+DOCKER_COMPOSE_YML=$(shell echo $(DOCKER_COMPOSE_DEPENDENCIES) | grep ".do_not_touch/docker-compose.*yml")
+
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
 endef
@@ -101,7 +103,7 @@ endif
 %/.:
 	$(MKDIR) $@
 
-install: $(INSTALL_DEPENDENCIES)
+install: $(INSTALL_DEPENDENCIES) .do_not_touch/config.mk
 	$(MAKE) -f $(THIS_MAKEFILE) .git/refs/heads/master
 
 .PHONY: git
@@ -215,10 +217,10 @@ bin/docker-compose: $(THIS_MAKEFILE) | $(call locate,curl) bin/. .env docker-com
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
 	chmod u+x $@
 
-docker-compose.yml: $(THIS_MAKEFILE) $(DOCKER_COMPOSE_DEPENDENCIES) .env docker-compose.override.yml
+docker-compose.yml: $(THIS_MAKEFILE) $(DOCKER_COMPOSE_YML) .env docker-compose.override.yml
 	$(RM) $@
 	echo "# DO NOT MODIFY THIS FILE, please put your specific docker-compose configuration in docker-compose.override.yml" > $@
-	$(DOCKER_COMPOSE) -f .do_not_touch/docker-compose.yml --env-file .env $$(find .do_not_touch -type f -name "docker-compose.*.yml" -exec echo "-f {}" \; | xargs) config >> $@
+	$(DOCKER_COMPOSE) -f $$(echo $(DOCKER_COMPOSE_YML) | sed -e 's/ / -f /g') --env-file .env config >> $@
 
 docker-compose.override.yml:
 	cp $(RESOURCES_DIR)/$@ $@
