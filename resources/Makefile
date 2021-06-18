@@ -82,7 +82,7 @@ endif
 %/.:
 	$(MKDIR) $@
 
-install: $(call locate,docker) bin/php bin/composer ## <Install> Install development environment
+install: $(call locate,docker) vendor bin/php bin/composer ## <Install> Install development environment
 
 .env:
 	$(call write,$@,"HOME=$(HOME)")
