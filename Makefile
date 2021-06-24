@@ -23,7 +23,7 @@ RESOURCES_DIR:=$(THIS_DIR)/resources
 MKDIR:=mkdir -p
 RM:=rm -rf
 CP:=cp -r
-DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
+DOCKER_COMPOSE:=docker compose
 
 -include .do_not_touch/config.mk
 
@@ -75,7 +75,7 @@ $(RM) $1
 $(call write,$1,'#!/usr/bin/env sh')
 $(call write,$1,'set -e')
 $(call write,$1,$4)
-$(call write,$1,'exec $(DOCKER_COMPOSE) run --rm $2 $3 "$$@" 2>/dev/null')
+$(call write,$1,'$(DOCKER_COMPOSE) run --rm $2 $3 "$$@" 2>/dev/null')
 chmod u+x $1
 endef
 
@@ -203,21 +203,14 @@ VERSION:
 bin/php: $(THIS_MAKEFILE) | .env docker-compose.yml bin/.
 	cat $(RESOURCES_DIR)/bin/php > $@
 
-bin/atoum: $(THIS_MAKEFILE) | .env bin/. .atoum.php bin/composer $(DOCKER_COMPOSE)
+bin/atoum: $(THIS_MAKEFILE) | .env bin/. .atoum.php bin/composer
 	bin/composer require --dev atoum/atoum ^4
 	$(call bin,$@,php,/src/vendor/$@)
 
-bin/composer: $(THIS_MAKEFILE) | .env docker-compose.yml bin/. .env $(DOCKER_COMPOSE)
+bin/composer: $(THIS_MAKEFILE) | .env docker-compose.yml bin/. .env
 	$(call bin,$@,composer,composer,$(MKDIR) \$$HOME/.composer)
 
-$(DOCKER_COMPOSE): docker-compose.yml
-
-bin/docker-compose: DOCKER_COMPOSE_VERSION=$(shell curl --silent "https://api.github.com/repos/docker/compose/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"([^"]+)".*/\1/')
-bin/docker-compose: $(THIS_MAKEFILE) | $(call locate,curl) bin/. .env docker-compose.yml
-	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
-	chmod u+x $@
-
-docker-compose.yml: $(THIS_MAKEFILE) $(DOCKER_COMPOSE_YML) .env docker-compose.override.yml
+docker-compose.yml: $(THIS_MAKEFILE) .env docker-compose.override.yml
 	$(RM) $@
 	echo "# DO NOT MODIFY THIS FILE, please put your specific docker-compose configuration in docker-compose.override.yml" > $@
 	$(DOCKER_COMPOSE) -f $$(echo $(DOCKER_COMPOSE_YML) | sed -e 's/ / -f /g') --env-file .env config >> $@
