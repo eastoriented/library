@@ -200,8 +200,8 @@ ssh: .passwd
 VERSION:
 	$(call write,$@,\$$Format:%ai\$$ \$$Format:%d\$$ \$$Format:%H\$$)
 
-bin/php: $(THIS_MAKEFILE) | .env docker-compose.yml bin/. $(DOCKER_COMPOSE)
-	$(call bin,$@,php,php)
+bin/php: $(THIS_MAKEFILE) | .env docker-compose.yml bin/.
+	cat $(RESOURCES_DIR)/bin/php > $@
 
 bin/atoum: $(THIS_MAKEFILE) | .env bin/. .atoum.php bin/composer $(DOCKER_COMPOSE)
 	bin/composer require --dev atoum/atoum ^4

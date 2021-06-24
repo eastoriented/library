@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+set -e
+
+tty=
+i=$#
+while [ $i -gt 0 ]; do
+    arg=$1
+    i=$((i - 1))
+    shift
+
+    if echo $arg | grep -q -e "^-.*l.*$" > /dev/null; then
+        tty=-T
+    fi
+
+    set -- "$@" "$arg"
+done
+
+docker compose run $tty --rm php php "$@" 2>/dev/null
