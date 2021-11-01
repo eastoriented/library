@@ -50,6 +50,10 @@ $(call write,$1,'exec $(DOCKER_COMPOSE) run --rm $2 $3 "$$@" 2>/dev/null')
 chmod u+x $1
 endef
 
+define uniq
+cat $1 | sort | uniq | tee $1 > /dev/null
+endef
+
 define semver
 semver=$$($(DOCKER_COMPOSE) run --rm semver semver -c -i $1 $$(git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)) && \
 git tag $$($$semver)
@@ -87,6 +91,8 @@ install: $(call locate,docker) vendor bin/php bin/composer ## <Install> Install 
 .env:
 	$(call write,$@,"HOME=$(HOME)")
 	$(call write,$@,"USER_ID=$$(id -u):$$(id -g)")
+	$(call write,$@,"NETWORK_NAME=$$(pwd | awk -F / '{print $NF}')")
+	$(call uniq,$@)
 
 docker-compose.yml: $(THIS_MAKEFILE) .env $(DOCKER_COMPOSE_YML)
 	$(RM) $@

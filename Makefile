@@ -66,6 +66,8 @@ INSTALL_DEPENDENCIES+= $(CI)
 
 DOCKER_COMPOSE_YML=$(shell echo $(DOCKER_COMPOSE_DEPENDENCIES) | grep ".do_not_touch/docker-compose.*yml")
 
+NETWORK_NAME?=$(shell pwd | awk -F / '{print $$NF}')
+
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
 endef
@@ -128,6 +130,7 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 	$(RM) $@
 	$(call write,$@,"HOME=$(HOME)")
 	$(call write,$@,"USER_ID=$$(id -u):$$(id -g)")
+	$(call write,$@,"NETWORK_NAME=$(NETWORK_NAME)")
 
 Makefile: $(THIS_MAKEFILE)
 	$(RM) $@
