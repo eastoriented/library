@@ -112,8 +112,8 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 .git: $(call locate,git)
 	git init
 
-.git%: $(RESOURCES_DIR)/git/.git%
-	cat $(RESOURCES_DIR)/git/$@ >> $@ && $(call uniq,$@)
+.git%: $(RESOURCES_DIR)/git/git%
+	cat $(RESOURCES_DIR)/git/git$* >> $@ && $(call uniq,$@)
 
 .git/hooks/pre-commit:
 	$(call write,$@,'#!/usr/bin/env sh')
