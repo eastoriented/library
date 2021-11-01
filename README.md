@@ -7,7 +7,7 @@ And finally, it provide a `Makefile` to execute tests, update vendor, manage ver
 
 ## Features
 
-- Install withh one line command;
+- Install with one line command;
 - Setup a PHP development environment using docker, so it is totally independant from software installed on the workstation;
 - Allow the user to swith PHP version "on the fly" (support PHP 7.1, 7.2, 7.3, 7.4 and 8 out of the box) and automaticaly update `vendor` directory accordingly;
 - Can tag version automaticaly according to previous version using [semver](https://semver.org);
@@ -17,15 +17,16 @@ And finally, it provide a `Makefile` to execute tests, update vendor, manage ver
 - Provide docker wrapper for `composer`, `php`, `atoum` and `docker-compose` in the `bin`directory;
 - Allow the user to make easily releases according to current commit or tag;
 - Define configuration to transparently use SSH keys with `composer` in a docker context;
-- Provide support for `.Lvimrc` file used by VIM plugin [`localvimrc`](https://github.com/embear/vim-localvimrc);
+- Provide support for `.lvimrc` file used by VIM plugin [`localvimrc`](https://github.com/embear/vim-localvimrc);
 - Initialize a git repository;
 - Provide default `.gitattributes` and `.gitognore` files;
-- Provide default MIT licence fil;
+- Provide default MIT licence file;
 - Provide default README.md;
 - Provide default VERSION file;
 - Works on OSX and Linux;
 - Support custom PHP images out of the box;
-- Easy to update.
+- Easy to update;
+- Use `composer` cache directory.
 
 # Requirements
 
