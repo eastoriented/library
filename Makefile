@@ -58,13 +58,13 @@ endif
 
 WITH_PHP_DOCKERFILES?=
 ifneq ($(strip $(WITH_PHP_DOCKERFILES)),)
-PHP_DOCKERFILES=$(shell find resources/docker/php -type f)
+PHP_DOCKERFILES:=$(shell find resources/docker/php -type f)
 DOCKER_COMPOSE_DEPENDENCIES+= .do_not_touch/docker-compose.php.yml docker/php
 endif
 
 INSTALL_DEPENDENCIES+= $(CI)
 
-DOCKER_COMPOSE_YML=$(shell echo $(DOCKER_COMPOSE_DEPENDENCIES) | grep ".do_not_touch/docker-compose.*yml")
+DOCKER_COMPOSE_YML:=$(shell echo $(DOCKER_COMPOSE_DEPENDENCIES) | grep ".do_not_touch/docker-compose.*yml")
 
 NETWORK_NAME?=$(shell pwd | awk -F / '{print $$NF}')
 
@@ -94,8 +94,8 @@ endef
 ifeq ($(strip $(WITH_DEBUG)),)
 .SILENT:
 else
-OLD_SHELL := $(SHELL)
-SHELL = $(warning $(if $@, Update target $@)$(if $<, from $<)$(if $?, due to $?))$(OLD_SHELL) -x
+OLD_SHELL:=$(SHELL)
+SHELL=$(warning $(if $@, Update target $@)$(if $<, from $<)$(if $?, due to $?))$(OLD_SHELL) -x
 endif
 
 .SUFFIXES:

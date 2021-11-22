@@ -35,7 +35,7 @@ DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
 CURRENT_VERSION:=$(shell git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)
 INSTALLED_PHP_VERSION:=$(shell grep -e "^\s\+php-\([^:]\+\)" docker-compose.yml docker-compose.override.yml 2>/dev/null | cut -d: -f2 | cut -d- -f2 | sort | uniq || true)
 
-DOCKER_COMPOSE_YML=$(shell find .do_not_touch -type f -name "docker-compose.*yml")
+DOCKER_COMPOSE_YML:=$(shell find .do_not_touch -type f -name "docker-compose.*yml")
 
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
@@ -71,8 +71,8 @@ bin/composer install
 endef
 
 ifneq ($(WITH_DEBUG),)
-OLD_SHELL := $(SHELL)
-SHELL = $(warning $(if $@, Update target $@)$(if $<, from $<)$(if $?, due to $?))$(OLD_SHELL) -x
+OLD_SHELL:=$(SHELL)
+SHELL=$(warning $(if $@, Update target $@)$(if $<, from $<)$(if $?, due to $?))$(OLD_SHELL) -x
 else
 .SILENT:
 endif
@@ -108,7 +108,7 @@ bin/atoum: $(THIS_MAKEFILE) | docker-compose.yml bin/. .atoum.php vendor $(DOCKE
 bin/composer: $(THIS_MAKEFILE) | docker-compose.yml bin/. .env $(DOCKER_COMPOSE) ## <Binaries> Create wrapper for `composer` using `docker`
 	$(call bin,$@,composer,composer,$(MKDIR) \$$HOME/.composer)
 
-bin/docker-compose: DOCKER_COMPOSE_VERSION=$(shell curl --silent "https://api.github.com/repos/docker/compose/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"([^"]+)".*/\1/')
+bin/docker-compose: DOCKER_COMPOSE_VERSION:=$(shell curl --silent "https://api.github.com/repos/docker/compose/releases/latest" | grep '"tag_name":' |  sed -E 's/.*"([^"]+)".*/\1/')
 bin/docker-compose: | $(call locate,curl) bin/. .env docker-compose.yml  ## <Binaries> Create wrapper for `docker-compose` using `docker`
 	curl -L --fail https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/run.sh -o $@
 	chmod u+x $@
