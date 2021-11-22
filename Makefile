@@ -23,7 +23,7 @@ RESOURCES_DIR:=$(THIS_DIR)/resources
 MKDIR:=mkdir -p
 RM:=rm -rf
 CP:=cp -r
-DOCKER_COMPOSE:=docker compose
+DOCKER_COMPOSE:=docker-compose
 
 -include .do_not_touch/config.mk
 
