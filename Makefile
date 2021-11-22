@@ -68,6 +68,8 @@ DOCKER_COMPOSE_YML=$(shell echo $(DOCKER_COMPOSE_DEPENDENCIES) | grep ".do_not_t
 
 NETWORK_NAME?=$(shell pwd | awk -F / '{print $$NF}')
 
+GIT_MAIN_BRANCH?=main
+
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
 endef
@@ -112,7 +114,7 @@ install: $(INSTALL_DEPENDENCIES) .do_not_touch/config.mk
 git: .git .gitignore .gitattributes .git/hooks/pre-commit
 
 .git: $(call locate,git)
-	git init
+	git init -b $(GIT_MAIN_BRANCH)
 
 .git%: $(RESOURCES_DIR)/git/git%
 	cat $(RESOURCES_DIR)/git/git$* >> $@ && $(call uniq,$@)
