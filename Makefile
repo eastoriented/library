@@ -217,7 +217,7 @@ bin/composer: $(THIS_MAKEFILE) | .env docker-compose.yml bin/. .env
 docker-compose.yml: $(THIS_MAKEFILE) .env docker-compose.override.yml
 	$(RM) $@
 	echo "# DO NOT MODIFY THIS FILE, please put your specific docker-compose configuration in docker-compose.override.yml" > $@
-	$(DOCKER_COMPOSE) -f $$(echo $(DOCKER_COMPOSE_YML) | sed -e 's/ / -f /g') --env-file .env config >> $@
+	$(DOCKER_COMPOSE) -f $$(echo $(DOCKER_COMPOSE_YML) | sed -e 's/ / -f /g') --env-file $$(pwd)/.env config >> $@
 
 docker-compose.override.yml:
 	cp $(RESOURCES_DIR)/$@ $@
