@@ -29,13 +29,14 @@ THIS_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 THIS_MAKEFILE=$(firstword $(MAKEFILE_LIST))
 RESOURCES_DIR:=$(THIS_DIR)/resources
 MKDIR:=mkdir -p
+CP:=cp -r
 RM:=rm -rf
 MV:=mv -f
 DOCKER_COMPOSE:=$(shell which docker-compose || echo 'bin/docker-compose')
 CURRENT_VERSION:=$(shell git describe --tags --abbrev=0 2>/dev/null || echo 0.0.0)
 INSTALLED_PHP_VERSION:=$(shell grep -e "^\s\+php-\([^:]\+\)" docker-compose.yml docker-compose.override.yml 2>/dev/null | cut -d: -f2 | cut -d- -f2 | sort | uniq || true)
 
-DOCKER_COMPOSE_YML:=$(shell find .do_not_touch -type f -name "docker-compose.*yml")
+DOCKER_COMPOSE_YML:=$(shell find .do_not_touch -type f -name "docker-compose.*yml" | sort -r)
 
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
@@ -96,8 +97,11 @@ install: $(call locate,docker) vendor bin/php bin/composer ## <Install> Install 
 
 docker-compose.yml: $(THIS_MAKEFILE) .env $(DOCKER_COMPOSE_YML)
 	$(RM) $@
-	echo "# DO NOT MODIFY THIS FILE, please put your specific docker-compose configuration in docker-compose.override.yml" > $@
-	$(DOCKER_COMPOSE) -f $$(echo $(DOCKER_COMPOSE_YML) | sed -e 's/ / -f /g') --env-file .env config >> $@
+	$(CP) $(DOCKER_COMPOSE_YML) .
+	echo "# DO NOT MODIFY THIS FILE, please put your specific docker-compose configuration in docker-compose.override.yml" > $@.tmp
+	$(DOCKER_COMPOSE) -f $$(echo $(DOCKER_COMPOSE_YML) | sed -e 's#.do_not_touch/##g' -e 's/ / -f /g') --env-file $$(pwd)/.env config >> $@.tmp
+	$(RM) docker-compose.*yml
+	cat $@.tmp >> $@ && $(RM) $@.tmp
 
 bin/php: $(THIS_MAKEFILE) | docker-compose.yml bin/. $(DOCKER_COMPOSE) ## <Binaries> Create wrapper for `php` using `docker`
 	$(call bin,$@,php,php)

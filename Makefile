@@ -19,7 +19,7 @@ verbose:
 else
 
 THIS_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-RESOURCES_DIR:=$(THIS_DIR)/resources
+RESOURCES_DIR:=$(THIS_DIR)resources
 MKDIR:=mkdir -p
 RM:=rm -rf
 CP:=cp -r
@@ -28,7 +28,8 @@ DOCKER_COMPOSE:=docker-compose
 -include .do_not_touch/config.mk
 
 INSTALL_DEPENDENCIES:=$(call locate,docker) $(call locate,git) bin/php bin/composer git Makefile .do_not_touch/Makefile docker-compose.yml VERSION LICENCE README.md CHANGELOG.md src/. tests/units
-DOCKER_COMPOSE_DEPENDENCIES:=.do_not_touch/docker-compose.yml
+DOCKER_COMPOSE_YML:=$(RESOURCES_DIR)/docker-compose.yml
+DOCKER_COMPOSE_DEPENDENCIES:=
 
 WITH_GITHUB?=true
 ifneq ($(strip $(WITH_GITHUB)),)
@@ -53,18 +54,17 @@ endif
 WITH_SSH?=
 ifneq ($(strip $(WITH_SSH)),)
 INSTALL_DEPENDENCIES+= ssh
-DOCKER_COMPOSE_DEPENDENCIES+= .do_not_touch/docker-compose.ssh.yml .passwd
+DOCKER_COMPOSE_DEPENDENCIES+= .passwd
+DOCKER_COMPOSE_YML+= $(RESOURCES_DIR)/docker-compose.ssh.yml
 endif
 
 WITH_PHP_DOCKERFILES?=
 ifneq ($(strip $(WITH_PHP_DOCKERFILES)),)
 PHP_DOCKERFILES:=$(shell find resources/docker/php -type f)
-DOCKER_COMPOSE_DEPENDENCIES+= .do_not_touch/docker-compose.php.yml docker/php
+DOCKER_COMPOSE_YML+= $(RESOURCES_DIR)/docker-compose.php.yml docker/php
 endif
 
 INSTALL_DEPENDENCIES+= $(CI)
-
-DOCKER_COMPOSE_YML:=$(shell echo $(DOCKER_COMPOSE_DEPENDENCIES) | grep ".do_not_touch/docker-compose.*yml")
 
 NETWORK_NAME?=$(shell pwd | awk -F / '{print $$NF}')
 
@@ -79,7 +79,7 @@ $(RM) $1
 $(call write,$1,'#!/usr/bin/env sh')
 $(call write,$1,'set -e')
 $(call write,$1,$4)
-$(call write,$1,'$(DOCKER_COMPOSE) run --rm $2 $3 "$$@" 2>/dev/null')
+$(call write,$1,'$(DOCKER_COMPOSE) run --rm $2 $3 "$$@"')
 chmod u+x $1
 endef
 
@@ -139,23 +139,23 @@ Makefile: $(THIS_MAKEFILE)
 	$(call write,$@,include .do_not_touch/Makefile)
 
 .do_not_touch/Makefile: $(RESOURCES_DIR)/Makefile
-	cp $(RESOURCES_DIR)/Makefile $@
+	$(CP) $(RESOURCES_DIR)/Makefile $@
 
 .do_not_touch/config.mk: $(THIS_MAKEFILE) | .do_not_touch/.
 	$(RM) $@
 	$(call write,$@,"INSTALL_DEPENDENCIES:=$(INSTALL_DEPENDENCIES)")
 
-.do_not_touch/docker-compose.yml: $(RESOURCES_DIR)/docker-compose.yml | .do_not_touch/.
-	cp $(RESOURCES_DIR)/docker-compose.yml $@
+.do_not_touch/docker-compose.yml: $(DOCKER_COMPOSE_YML) | .do_not_touch/.
+	$(CP) $(DOCKER_COMPOSE_YML) .do_not_touch
 
 .do_not_touch/docker-compose.%.yml: $(RESOURCES_DIR)/docker-compose.%.yml | .do_not_touch/.
-	cp $(RESOURCES_DIR)/docker-compose.$*.yml $@
+	$(CP) $(RESOURCES_DIR)/docker-compose.$*.yml $@
 
 %.md:
-	cp $(RESOURCES_DIR)/$*.md $@
+	$(CP) $(RESOURCES_DIR)/$*.md $@
 
 LICENCE:
-	cp $(RESOURCES_DIR)/$@ $@
+	$(CP) $(RESOURCES_DIR)/$@ $@
 
 docker/php: docker/php/. $(PHP_DOCKERFILES)
 	$(CP) $(RESOURCES_DIR)/docker/php/* $^
@@ -165,34 +165,34 @@ travis: .travis.yml .atoum.php .gitattributes $(THIS_MAKEFILE)
 	echo ".travis.yml export-ignore" >> .gitattributes && $(call uniq,.gitattributes)
 
 .travis.yml:
-	cp $(RESOURCES_DIR)/ci/travis/$@ $@
+	$(CP) $(RESOURCES_DIR)/ci/travis/$@ $@
 
 .PHONY: github
 github: .github/workflows/tests.yml .atoum.php .gitattributes $(THIS_MAKEFILE)
 	echo ".github export-ignore" >> .gitattributes && $(call uniq,.gitattributes)
 
 .github/workflows/tests.yml: .github/workflows/.
-	cp $(RESOURCES_DIR)/ci/github/tests.yml $^
+	$(CP) $(RESOURCES_DIR)/ci/github/tests.yml $^
 
 .PHONY: gitlab
 gitlab: .gitlab-ci.yml .gitattributes $(THIS_MAKEFILE)
 	echo ".gitlab-ci.yml export-ignore" >> .gitattributes && $(call uniq,.gitattributes)
 
 .gitlab-ci.yml:
-	cp $(RESOURCES_DIR)/ci/gitlab/$@ $@
+	$(CP) $(RESOURCES_DIR)/ci/gitlab/$@ $@
 
 .atoum.php:
-	cp $(RESOURCES_DIR)/ci/$(CI)/$@ $@
+	$(CP) $(RESOURCES_DIR)/ci/$(CI)/$@ $@
 
 .PHONY: vim
 vim: .lvimrc
 
 .lvimrc: .atoum.vim.php
-	cp $(RESOURCES_DIR)/$@ $@
+	$(CP) $(RESOURCES_DIR)/$@ $@
 
 .atoum.vim.php: GITIGNORE_FILE?=$(shell git config --global --get core.excludesfile || echo $$HOME/.config/git/ignore)
 .atoum.vim.php:
-	cp $(RESOURCES_DIR)/$@ $@
+	$(CP) $(RESOURCES_DIR)/$@ $@
 	grep -q .atoum.vim.php $(GITIGNORE_FILE) || echo '.atoum.vim.php' >> $(GITIGNORE_FILE)
 
 .PHONY: ssh
@@ -216,10 +216,13 @@ bin/atoum: $(THIS_MAKEFILE) | .env bin/. .atoum.php bin/composer
 bin/composer: $(THIS_MAKEFILE) | .env docker-compose.yml bin/. .env
 	$(call bin,$@,composer,composer,$(MKDIR) \$$HOME/.composer)
 
-docker-compose.yml: $(THIS_MAKEFILE) .env docker-compose.override.yml
+docker-compose.yml: $(THIS_MAKEFILE) .env docker-compose.override.yml $(DOCKER_COMPOSE_YML) $(DOCKER_COMPOSE_DEPENDENCIES)
 	$(RM) $@
-	echo "# DO NOT MODIFY THIS FILE, please put your specific docker-compose configuration in docker-compose.override.yml" > $@
-	$(DOCKER_COMPOSE) -f $$(echo $(DOCKER_COMPOSE_YML) | sed -e 's/ / -f /g') --env-file $$(pwd)/.env config >> $@
+	$(CP) $(DOCKER_COMPOSE_YML) .
+	echo "# DO NOT MODIFY THIS FILE, please put your specific docker-compose configuration in docker-compose.override.yml" > $@.tmp
+	$(DOCKER_COMPOSE) -f $$(echo $(DOCKER_COMPOSE_YML) | sed -e 's#$(RESOURCES_DIR)/##g' -e 's/ / -f /g') --env-file $$(pwd)/.env config >> $@.tmp
+	$(RM) docker-compose.*yml
+	cat $@.tmp >> $@ && $(RM) $@.tmp
 
 docker-compose.override.yml:
 	cp $(RESOURCES_DIR)/$@ $@
@@ -230,10 +233,10 @@ tests/units: tests/units/runner.php tests/units/test.php tests/units/src
 tests/units/src: tests/units/src/.
 
 tests/units/runner.php: $(RESOURCES_DIR)/atoum/$@ | bin/atoum tests/units/.
-	cp -r $(RESOURCES_DIR)/atoum/$@ $@
+	$(CP) $(RESOURCES_DIR)/atoum/$@ $@
 
 tests/units/test.php: $(RESOURCES_DIR)/atoum/$@ | bin/atoum tests/units/.
-	cp -r $(RESOURCES_DIR)/atoum/$@ $@
+	$(CP) $(RESOURCES_DIR)/atoum/$@ $@
 
 .PHONY: verbose
 verbose:

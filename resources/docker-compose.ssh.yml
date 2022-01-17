@@ -3,5 +3,5 @@ version: '2.4'
 services:
    composer:
       volumes:
-         - ../.passwd:/etc/passwd
+         - ./.passwd:/etc/passwd
          - ${HOME}/.ssh:/.ssh
