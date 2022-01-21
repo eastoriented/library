@@ -38,6 +38,8 @@ INSTALLED_PHP_VERSION:=$(shell grep -e "^\s\+php-\([^:]\+\)" docker-compose.yml 
 
 DOCKER_COMPOSE_YML:=$(shell find .do_not_touch -type f -name "docker-compose.*yml" | sort -r)
 
+NETWORK_NAME?=$(shell pwd | awk -F / '{print $$NF}')
+
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
 endef
@@ -92,7 +94,7 @@ install: $(call locate,docker) vendor bin/php bin/composer ## <Install> Install 
 .env:
 	$(call write,$@,"HOME=$(HOME)")
 	$(call write,$@,"USER_ID=$$(id -u):$$(id -g)")
-	$(call write,$@,"NETWORK_NAME=$$(pwd | awk -F / '{print $NF}')")
+	$(call write,$@,"NETWORK_NAME=$(NETWORK_NAME)")
 	$(call uniq,$@)
 
 docker-compose.yml: $(THIS_MAKEFILE) .env $(DOCKER_COMPOSE_YML)
