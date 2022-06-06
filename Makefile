@@ -2,6 +2,8 @@
 MAKEFLAGS+= --no-builtin-rules
 MAKEFLAGS+= --no-builtin-variables
 
+SHELL=/bin/bash -e
+
 .DEFAULT_GOAL:=install
 
 THIS_MAKEFILE=$(firstword $(MAKEFILE_LIST))
