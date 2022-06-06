@@ -72,6 +72,8 @@ NETWORK_NAME?=$(shell pwd | awk -F / '{print $$NF}')
 
 GIT_MAIN_BRANCH?=main
 
+GITIGNORE_FILE?=$(shell git config --global --get core.excludesfile || echo $$HOME/.config/git/ignore)
+
 define locate
 $(or $(shell which $1),$(error \`$1\` is not in \`$(PATH)\`, please install it!))
 endef
@@ -192,8 +194,11 @@ vim: .lvimrc
 .lvimrc: .atoum.vim.php
 	$(CP) $(RESOURCES_DIR)/$@ $@
 
-.atoum.vim.php: GITIGNORE_FILE?=$(shell git config --global --get core.excludesfile || { $(MKDIR) $$HOME/.config/git; > $$HOME/.config/git/ignore; echo $$HOME/.config/git/ignore; })
-.atoum.vim.php:
+$(GITIGNORE_FILE):
+	$(MKDIR) $(dirname $(GITIGNORE_FILE))
+	> $@
+	
+.atoum.vim.php: $(GITIGNORE_FILE)
 	$(CP) $(RESOURCES_DIR)/$@ $@
 	grep -q .atoum.vim.php $(GITIGNORE_FILE) || echo '.atoum.vim.php' >> $(GITIGNORE_FILE)
 
