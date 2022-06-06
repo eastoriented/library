@@ -190,7 +190,7 @@ vim: .lvimrc
 .lvimrc: .atoum.vim.php
 	$(CP) $(RESOURCES_DIR)/$@ $@
 
-.atoum.vim.php: GITIGNORE_FILE?=$(shell git config --global --get core.excludesfile || echo $$HOME/.config/git/ignore)
+.atoum.vim.php: GITIGNORE_FILE?=$(shell git config --global --get core.excludesfile || $(MKDIR) $$HOME/.config/.git && echo $$HOME/.config/git/ignore)
 .atoum.vim.php:
 	$(CP) $(RESOURCES_DIR)/$@ $@
 	grep -q .atoum.vim.php $(GITIGNORE_FILE) || echo '.atoum.vim.php' >> $(GITIGNORE_FILE)
