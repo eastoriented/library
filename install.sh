@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -e
 
@@ -9,6 +9,6 @@ fi
 
 mkdir -p $HOME/.composer
 
-docker run --rm -u $(id -u):$(id -g) -v $(pwd):/src -w /src -v $HOME/.composer:/.composer -e COMPOSER_CACHE_DIR=/.composer -e COMPOSER_ALLOW_SUPERUSER=1 -u $(id -u) composer:latest composer require --dev eastoriented/library "${@:-dev-master}"
+docker run --rm -u $(id -u):$(id -g) -v "$(pwd)":/src -w /src -v "$HOME/.composer":/.composer -e COMPOSER_CACHE_DIR=/.composer -e COMPOSER_ALLOW_SUPERUSER=1 composer:latest composer require --dev eastoriented/library "${@:-dev-master}"
 
 ./vendor/bin/eastoriented-library install
