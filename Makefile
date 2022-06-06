@@ -195,7 +195,7 @@ vim: .lvimrc
 	$(CP) $(RESOURCES_DIR)/$@ $@
 
 $(GITIGNORE_FILE):
-	$(MKDIR) $(dirname $(GITIGNORE_FILE))
+	$(MKDIR) $$(dirname $(GITIGNORE_FILE))
 	> $@
 	
 .atoum.vim.php: $(GITIGNORE_FILE)
