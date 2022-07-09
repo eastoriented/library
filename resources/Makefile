@@ -153,7 +153,7 @@ version/new/patch: | $(DOCKER_COMPOSE) ## <Versioning> Create tag for new patch 
 release: releases/$(VERSION).tgz
 
 releases/$(VERSION).tgz: VERSION:=$(shell git describe --exact-match --tags 2> /dev/null || git rev-parse --short HEAD)
-releases/$(VERSION).tgz: ./.git/HEAD | ./bin/composer ./releases. ## Create a tarball in `./releases` directory according to current tag or commit
+releases/$(VERSION).tgz: ./.git/HEAD | ./bin/composer ./releases/. ## Create a tarball in `./releases` directory according to current tag or commit
 	$(RM) ./releases/tmp && $(MKDIR) ./releases/tmp
 	git archive --format=tar HEAD | tar -x -C ./releases/tmp
 	cd ./releases/tmp && tar czpf ../$(VERSION).tgz .
