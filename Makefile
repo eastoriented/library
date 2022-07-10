@@ -158,7 +158,7 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 	$(call write,$@,"USER_ID=$$(id -u):$$(id -g)")
 	$(call write,$@,"NETWORK_NAME=$(NETWORK_NAME)")
 
-Makefile: $(THIS_MAKEFILE)
+Makefile:
 	$(RM) $@
 	$(call write,$@,include .do_not_touch/Makefile)
 
