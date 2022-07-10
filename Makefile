@@ -80,10 +80,30 @@ endef
 
 define bin
 $(RM) $1
-$(call write,$1,'#!/usr/bin/env sh')
-$(call write,$1,'set -e')
-$(call write,$1,$4)
-$(call write,$1,'$(DOCKER_COMPOSE) run --rm $2 $3 "$$@"')
+echo '#!/usr/bin/env sh' >> $1
+echo 'set -e' >> $1
+echo 'for i in "$$@"; do' >> $1
+echo 'case $$i in' >> $1
+echo '--docker-working-dir=*)' >> $1
+echo 'DOCKER_OPTIONS+=" -w $${i#*=}"' >> $1
+echo 'shift' >> $1
+echo ';;' >> $1
+echo '--docker-volume=*)' >> $1
+echo 'DOCKER_OPTIONS+=" -v $${i#*=}"' >> $1
+echo 'shift' >> $1
+echo ';;' >> $1
+echo '--docker-env=*)' >> $1
+echo 'DOCKER_OPTIONS+=" -e $${i#*=}"' >> $1
+echo 'shift' >> $1
+echo ';;' >> $1
+echo '--docker-no-tty)' >> $1
+echo 'DOCKER_OPTIONS+=" -T"' >> $1
+echo 'shift' >> $1
+echo ';;' >> $1
+echo 'esac' >> $1
+echo 'done' >> $1
+echo $4 >> $1
+echo '$(DOCKER_COMPOSE) run --rm $$DOCKER_OPTIONS $2 $3 "$$@"' >> $1
 chmod u+x $1
 endef
 
@@ -112,7 +132,7 @@ endif
 	$(MKDIR) $@
 
 install: $(INSTALL_DEPENDENCIES) .do_not_touch/config.mk
-	$(MAKE) -f $(THIS_MAKEFILE) .git/refs/heads/master
+	$(MAKE) -f $(THIS_MAKEFILE) .git/refs/heads/$(GIT_MAIN_BRANCH)
 
 .PHONY: git
 git: .git .gitignore .gitattributes .git/hooks/pre-commit
@@ -128,7 +148,7 @@ git: .git .gitignore .gitattributes .git/hooks/pre-commit
 	$(call write,$@,make tests/units)
 	chmod u+x $@
 
-.git/refs/heads/master: | .git
+.git/refs/heads/$(GIT_MAIN_BRANCH): | .git
 	git add -A
 	git commit --quiet -n -m "Init done, have a good journey!"
 
